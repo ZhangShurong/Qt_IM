@@ -1,5 +1,7 @@
 #include <QtGui/QApplication>
 #include "view/IMLoginWidget.h"
+#include "view/IMMainWidget.h"
+#include "view/IMChatWidget.h"
 #include <QTextCodec>
 #include <QDebug>
 
@@ -22,7 +24,12 @@ int main(int argc, char *argv[])
         qDebug() << "click";
         w.onClickBtnLogin();
     }
-
+    UserInformation me;
+    IMMainWidget mw(me);
+    mw.show();
+    ChatInformation in;
+    IMChatWidget chat(in);
+    chat.show();
 //    IMInformationWidget w;
 //    w.setReadOnly(true, true);
 //    w.show();
@@ -30,4 +37,3 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-//192.168.50.133

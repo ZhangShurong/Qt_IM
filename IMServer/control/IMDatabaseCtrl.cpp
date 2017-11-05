@@ -11,7 +11,7 @@ Changes：
 #include <QVariant>
 #include <qdebug.h>
 #include <QSqlError>
-#include <QTextDocument>s
+#include <QTextDocument>
 #include "model/IMEncryption.h"
 
 static const QString UPDATE_STATUS_IN_USERINFORMATION_SQL =
