@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     interface/message_list.cpp \
     interface/friend_item.cpp \
     interface/message_item.cpp \
-    interface/im_btn.cpp
+    interface/im_btn.cpp \
+    interface/chat_widget.cpp
 
 HEADERS  += interface/login_window.h \
     interface/click_label.h \
@@ -31,7 +32,8 @@ HEADERS  += interface/login_window.h \
     interface/message_list.h \
     interface/friend_item.h \
     interface/message_item.h \
-    interface/im_btn.h
+    interface/im_btn.h \
+    interface/chat_widget.h
 
 RESOURCES += \
     images.qrc
