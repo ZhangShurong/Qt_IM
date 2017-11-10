@@ -1,0 +1,18 @@
+{
+    "reg":{
+        "user_name":"CV",
+        "pwd":"1314",
+        "question":"bf",
+        "ans":"vergilzhang"
+    },
+    "login":{
+        "user_name":"CV",
+        "pwd":"1314"
+    },
+    "conversation":{
+        "message":{
+            "from":"12345@lamfire.com",
+            "to":"54321@lamfire.com",
+            "body":"hello"}
+        }
+}
