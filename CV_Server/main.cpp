@@ -3,9 +3,18 @@
 #include "IM/user.h"
 #include "IM/imclient.h"
 #include <iostream>
+#include <thread>
+#include <windows.h>
 using namespace std;
 int main() {
-    //test();
+//    thread t([]
+//    {
+//        Sleep(10);
+//        test();
+//    }
+//    );
+//    t.detach();
+
     User *self = new User(0);
     IMClient *im = &IMClient::Instance(self);
     cout << im->getCurrID() << endl;

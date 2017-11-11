@@ -20,6 +20,7 @@ private:
     bool winsockStarted;
     void stop();
     void msg_distribution(SOCKET ClientSocket);
+    void parse(string json_str);
 public:
     IMServerLocal(string port);
     int start();
