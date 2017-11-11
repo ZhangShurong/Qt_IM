@@ -6,7 +6,8 @@
 #include <ws2tcpip.h>
 #include <string>
 #include "protocol/jspp.h"
-#define LINE_BUF 2048
+#include "utils/utils.h"
+
 using std::string;
 class IMClient;
 class IMServerLocal:public QObject
@@ -21,7 +22,6 @@ private:
     bool winsockStarted;
     void stop();
     void msg_distribution(SOCKET ClientSocket);
-    JSPP parse(string json_str);
 public:
     IMServerLocal(string port);
     int start();

@@ -4,6 +4,7 @@
 #include "user.h"
 #include <thread>
 #include "utils/jsoncpp/json.h"
+#include "IM/connection.h"
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
@@ -52,55 +53,11 @@ IMServerLocal::~IMServerLocal()
 
 void IMServerLocal::msg_distribution(SOCKET ClientSocket)
 {
+    Connection *conn = new Connection(ClientSocket);
+    im->newConnection(conn);
      //消息在这里集中解析分发
-    int iResult;
-    char recvbuf[LINE_BUF];
-    int recvbuflen = LINE_BUF;
-    do {
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-            printf("Bytes received: %d\n", iResult);
-            im->recvMsg(parse(string(recvbuf)));
-        }
-        else if (iResult == 0)
-            printf("Connection closing...\n");
-        else  {
-            printf("recv failed with error: %d\n", WSAGetLastError());
-            closesocket(ClientSocket);
-            WSACleanup();
-            return ;
-        }
-
-    } while (iResult > 0);
-
-    // shutdown the connection since we're done
-    iResult = shutdown(ClientSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ClientSocket);
-        WSACleanup();
-        return ;
-    }
-
-    // cleanup
-    closesocket(ClientSocket);
 }
 
-JSPP IMServerLocal::parse(std::__cxx11::string json_str)
-{
-    JSPP jspp_msg;
-    const char* str = json_str.c_str();
-    Json::Reader reader;
-    Json::Value root;
-    if (reader.parse(str, root))  // reader将Json字符串解析到root，root将包含Json里所有子元素
-    {
-        jspp_msg.type = root["type"].asString();  // 访问节点，upload_id = "UP000000"
-        jspp_msg.to = root["to"].asString();
-        jspp_msg.from = root["from"].asString();
-        jspp_msg.body = root["body"].asString();
-    }
-    return jspp_msg;
-}
 
 //初始化socket并开始监听
 bool IMServerLocal::initSock()

@@ -1,7 +1,8 @@
 #include "conversation.h"
-#include <string>
+
 #include <iostream>
-void Conversation::addMsg(std::__cxx11::string msg)
+
+void Conversation::addMsg(string msg)
 {
     msg_vec.push_back(msg);
     std::cout << msg << std::endl;

@@ -13,7 +13,12 @@ int IMClient::sendMsg(unsigned int peer_id)
 
 int IMClient::getCurrID()
 {
- return self->getID();
+    return self->getID();
+}
+
+void IMClient::newConnection(Connection *newConn)
+{
+    unkown_conn.push_back(newConn);
 }
 
 void IMClient::recvMsg(JSPP msg)
