@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <string>
+#define LINE_BUF 2048
 using std::string;
 class IMClient;
 class IMServerLocal:public QObject
@@ -18,15 +19,11 @@ private:
     void linkSignalWithSlot();
     bool winsockStarted;
     void stop();
+    void msg_distribution(SOCKET ClientSocket);
 public:
     IMServerLocal(string port);
     int start();
     ~IMServerLocal();
-signals:
-    void friendConnected(SOCKET clientSock);
-    void parseOver(string msg);
-private slots:
-    void connectFromFriend(SOCKET clientSock);
 };
 
 #endif // IMSERVERLOCAL_H

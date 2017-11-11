@@ -15,7 +15,9 @@ SOURCES += main.cpp \
     IM/imserver_local.cpp \
     IM/friend.cpp \
     IM/imclient.cpp \
-    IM/conversation.cpp
+    IM/conversation.cpp \
+    protocol/jspp.cpp
+
 
 HEADERS += \
     IM/user.h \
@@ -40,4 +42,7 @@ HEADERS += \
     IM/friend.h \
     IM/imclient.h \
     IM/conversation.h \
+    protocol/jspp.h
 
+DISTFILES += \
+    utils/jsoncpp/CMakeLists.txt

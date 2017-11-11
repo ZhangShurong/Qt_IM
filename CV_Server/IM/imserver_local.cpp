@@ -2,7 +2,7 @@
 #include <iostream>
 #include "imclient.h"
 #include "user.h"
-
+#include <thread>
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
@@ -23,14 +23,21 @@ int IMServerLocal::start()
         SOCKET ClientSocket = INVALID_SOCKET;
         // Accept a client socket
         ClientSocket = accept(ListenSocket, NULL, NULL);
-        if (ClientSocket == INVALID_SOCKET) {
-            printf("accept failed with error: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
-            WSACleanup();
-            return 1;
+        std::thread t([=]{
+            if (ClientSocket == INVALID_SOCKET) {
+                printf("accept failed with error: %d\n", WSAGetLastError());
+                closesocket(ListenSocket);
+                WSACleanup();
+                return 1;
+            }
+            else {
+                msg_distribution(ClientSocket);
+            }
         }
-        emit friendConnected(ClientSocket);
+        );
+        t.detach();
     }
+
     return 0;
 }
 
@@ -42,27 +49,17 @@ IMServerLocal::~IMServerLocal()
         WSACleanup();
 }
 
-void IMServerLocal::connectFromFriend(SOCKET ClientSocket)
+void IMServerLocal::msg_distribution(SOCKET ClientSocket)
 {
-
-    //消息在这里集中解析分发
-    int iResult,iSendResult;
-    char recvbuf[512];
-    int recvbuflen = 512;
+     //消息在这里集中解析分发
+    int iResult;
+    char recvbuf[LINE_BUF];
+    int recvbuflen = LINE_BUF;
     do {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
-            emit parseOver(string(recvbuf));
-            // Echo the buffer back to the sender
-            iSendResult = send( ClientSocket, recvbuf, iResult, 0 );
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
-                WSACleanup();
-                return ;
-            }
-            printf("Bytes sent: %d\n", iSendResult);
+            im->recvMsg(string(recvbuf));
         }
         else if (iResult == 0)
             printf("Connection closing...\n");
@@ -86,6 +83,10 @@ void IMServerLocal::connectFromFriend(SOCKET ClientSocket)
 
     // cleanup
     closesocket(ClientSocket);
+}
+
+void IMServerLocal::parse(std::__cxx11::string json_str)
+{
 
 }
 
@@ -139,8 +140,7 @@ bool IMServerLocal::initSock()
 
 void IMServerLocal::linkSignalWithSlot()
 {
-    connect(this,SIGNAL(friendConnected(SOCKET)), this, SLOT(connectFromFriend(SOCKET)));
-    connect(this, SIGNAL(parseOver(string)), im, SLOT(recvMsg(string)));
+
 }
 void IMServerLocal::stop()
 {
@@ -150,3 +150,4 @@ void IMServerLocal::stop()
         ListenSocket = INVALID_SOCKET;
     }
 }
+
