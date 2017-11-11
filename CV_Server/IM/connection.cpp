@@ -30,7 +30,7 @@ void Connection::recv_msg()
                 peer_id = msg.from;
             }
             std::cout << msg.body << std::endl;
-            msg_vec.push_back(msg);
+            unread_msg_vec.push_back(msg);
         }
         else if (iResult == 0)
             printf("Connection closing...\n");
@@ -54,4 +54,9 @@ void Connection::recv_msg()
     // cleanup
     closesocket(sock);
     connected = false;
+}
+
+int Connection::senMsg(JSPP msg)
+{
+    unsend_msg_vec.push_back(msg);
 }

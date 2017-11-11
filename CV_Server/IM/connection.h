@@ -19,12 +19,13 @@ private:
     bool connected;
     string peer_id;
     string self_id;
-    vector<JSPP> msg_vec;
+    vector<JSPP> unread_msg_vec;
+    vector<JSPP> unsend_msg_vec;
 public:
     Connection();
     Connection(SOCKET sock);
     void recv_msg();
-    int senMsg(string msg);
+    int senMsg(JSPP msg);
 };
 
 #endif // CONNECTION_H
