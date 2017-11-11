@@ -46,5 +46,3 @@ HEADERS += \
     protocol/jspp.h \
     utils/utils.h
 
-DISTFILES += \
-    utils/jsoncpp/CMakeLists.txt
