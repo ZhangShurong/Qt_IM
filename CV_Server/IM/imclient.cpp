@@ -16,9 +16,9 @@ int IMClient::getCurrID()
  return self->getID();
 }
 
-void IMClient::recvMsg(string msg)
+void IMClient::recvMsg(JSPP msg)
 {
-    std::cout << msg << std::endl;
+    std::cout << msg.body << std::endl;
 }
 
 IMClient::IMClient(User *user)

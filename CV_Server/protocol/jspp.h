@@ -7,6 +7,11 @@ struct Error
 {
     int code;
     string body;
+    Error():
+        code(0),body("")
+    {
+
+    }
 };
 
 struct JSPP
@@ -17,6 +22,8 @@ struct JSPP
     string id;
     string body;
     Error error;
+    JSPP():type("empty"),from(""),to(""),id(""),body("")
+    {}
 };
 struct Message : public JSPP
 {

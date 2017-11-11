@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include <string>
+#include "protocol/jspp.h"
 using std::string;
 class User;
 class Conversation;
+class JSPP;
 class IMClient : public QObject
 {
     Q_OBJECT
@@ -20,7 +22,7 @@ public:
     }
     int getCurrID();
 public slots:
-    void recvMsg(string msg);
+    void recvMsg(JSPP msg);
 private:
     IMClient() = delete;
     IMClient(User *user);                            // ctor hidden

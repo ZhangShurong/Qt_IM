@@ -7,13 +7,13 @@
 #include <windows.h>
 using namespace std;
 int main() {
-//    thread t([]
-//    {
-//        Sleep(10);
-//        test();
-//    }
-//    );
-//    t.detach();
+    thread t([]
+    {
+        Sleep(10);
+        test();
+    }
+    );
+    t.detach();
 
     User *self = new User(0);
     IMClient *im = &IMClient::Instance(self);
