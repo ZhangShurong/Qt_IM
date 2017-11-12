@@ -3,12 +3,21 @@
 #include "user.h"
 #include <iostream>
 
-void Conversation::addMsg(string msg)
+//void Conversation::addMsg(string msg)
+//{
+//    msg_vec.push_back(msg);
+//    std::cout << msg << std::endl;
+//    unread_count ++;
+//    std::cout << "unread_count is " << unread_count << std::endl;
+//}
+
+void Conversation::sendMsg(std::__cxx11::string msg)
 {
-    msg_vec.push_back(msg);
     std::cout << msg << std::endl;
-    unread_count ++;
-    std::cout << "unread_count is " << unread_count << std::endl;
+    if(!conn)
+        conn = new Connection();
+    conn->send_msg();
+
 }
 
 string Conversation::getPeerID()

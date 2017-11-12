@@ -18,7 +18,7 @@ class Conversation : public QObject
     vector<string> msg_vec;//暂时这样储存消息
     unsigned int unread_count;
 public:
-    void addMsg(string msg);
+    void sendMsg(string msg);
     string getPeerID();
 public:
     Conversation(User* peer_user);

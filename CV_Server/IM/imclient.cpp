@@ -37,7 +37,16 @@ void IMClient::mergeConn()
 
 int IMClient::sendMsg(string peer_id)
 {
-
+    std::cout  << peer_id << std::endl;
+    for(size_t i = 0; i < conv_vec.size(); ++i) {
+        if(conv_vec.at(i)->getPeerID() == peer_id){
+            conv_vec.at(i)->sendMsg("Send Interface");
+            return 0;
+        }
+    }
+    createConversation(new User(peer_id));
+    conv_vec.back()->sendMsg("Send Interface");
+    return 0;
 }
 
 string IMClient::getCurrID()

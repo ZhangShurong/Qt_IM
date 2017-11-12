@@ -18,7 +18,7 @@ private:
     IMClient *im;
     string port;
     SOCKET ListenSocket;
-    QThread workerThread;
+    QThread distributorThread;
     bool initSock();
     void linkSignalWithSlot();
     bool winsockStarted;
@@ -31,7 +31,7 @@ public:
     ~IMServerLocal();
 };
 
-class Worker : public QObject
+class Distributor : public QObject
 {
     Q_OBJECT
 public slots:

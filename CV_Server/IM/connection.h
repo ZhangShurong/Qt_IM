@@ -24,7 +24,8 @@ private:
 
     QTimer *timer;
     void recv_msg();
-    void send_msg();
+    int connectToPeer();
+
     void linksigSlot();
 private slots:
     void checkQueue();
@@ -42,6 +43,7 @@ public:
     SOCKET getpeer_sock();
     vector<JSPP> unread_msg_vec;
     vector<JSPP> unsend_msg_vec;
+    void send_msg();//暂时公开用作测试
 };
 
 #endif // CONNECTION_H

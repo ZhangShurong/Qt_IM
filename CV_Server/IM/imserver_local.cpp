@@ -20,6 +20,7 @@ IMServerLocal::IMServerLocal(string port)
     linkSignalWithSlot();
     qRegisterMetaType<SOCKET>("SOCKET");
 }
+
 int IMServerLocal::start()
 {
     while(1){
@@ -46,7 +47,7 @@ IMServerLocal::~IMServerLocal()
         WSACleanup();
 }
 
-void Worker::msg_distribution(SOCKET ClientSocket)
+void Distributor::msg_distribution(SOCKET ClientSocket)
 {
     Connection *conn = new Connection(ClientSocket);
     IMClient::Instance(nullptr).newConnection(conn);
@@ -104,11 +105,11 @@ bool IMServerLocal::initSock()
 
 void IMServerLocal::linkSignalWithSlot()
 {
-    Worker *worker = new Worker;
-    worker->moveToThread(&workerThread);
-    connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &IMServerLocal::newConn, worker, &Worker::msg_distribution);
-    workerThread.start();
+    Distributor *worker = new Distributor;
+    worker->moveToThread(&distributorThread);
+    connect(&distributorThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &IMServerLocal::newConn, worker, &Distributor::msg_distribution);
+    distributorThread.start();
 }
 void IMServerLocal::stop()
 {

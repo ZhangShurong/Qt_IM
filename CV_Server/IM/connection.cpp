@@ -85,11 +85,91 @@ void Connection::recv_msg()
     peer_sock = INVALID_SOCKET;
 }
 
+int Connection::connectToPeer()
+{
+    struct addrinfo *result = NULL,
+            *ptr = NULL,
+            hints;
+
+    int iResult;
+
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+
+    // Resolve the server address and port
+    iResult = getaddrinfo("127.0.0.1", "1024", &hints, &result);
+    if ( iResult != 0 ) {
+        printf("getaddrinfo failed with error: %d\n", iResult);
+        return 1;
+    }
+
+    // Attempt to connect to an address until one succeeds
+    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
+
+        // Create a SOCKET for connecting to server
+        self_sock = socket(ptr->ai_family, ptr->ai_socktype,
+                           ptr->ai_protocol);
+        if (self_sock == INVALID_SOCKET) {
+            printf("socket failed with error: %ld\n", WSAGetLastError());
+            return 1;
+        }
+
+        // Connect to server.
+        iResult = ::connect( self_sock, ptr->ai_addr, (int)ptr->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            closesocket(self_sock);
+            self_sock = INVALID_SOCKET;
+            continue;
+        }
+        break;
+    }
+
+    freeaddrinfo(result);
+
+    if (self_sock == INVALID_SOCKET) {
+        printf("Unable to connect to server!\n");
+        return 1;
+    }
+    return 0;
+}
+
 /*
  * 发送消息，从unsend_vector中读数据
  */
 void Connection::send_msg()
 {
+    if(self_sock == INVALID_SOCKET){
+        connectToPeer();
+    }
+    string send_str =
+            "{\"type\": \"chat\","
+            "\"to\": \""
+          "CV"
+            "\","
+            "\"from\": \"zsr\","
+            "\"body\": \"I love You too\"}";
+    const char *sendbuf = send_str.c_str();
+    // Send an initial buffer
+    int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
+    if (iResult == SOCKET_ERROR) {
+        printf("send failed with error: %d\n", WSAGetLastError());
+        closesocket(self_sock);
+        self_sock = INVALID_SOCKET;
+        return ;
+    }
+
+    printf("Bytes Sent: %ld\n", iResult);
+
+    // shutdown the connection since no more data will be sent
+    iResult = shutdown(self_sock, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        closesocket(self_sock);
+        self_sock = INVALID_SOCKET;
+        return ;
+    }
 
 }
 
@@ -103,6 +183,7 @@ void Connection::checkQueue()
 {
     if(!connected)
         recv_msg();
+    //send_msg();
 }
 
 int Connection::pushMsg(JSPP msg)
@@ -137,10 +218,10 @@ size_t Connection::getUnreadCount()
 
 void Connection::closeSock()
 {
-     if(peer_sock != INVALID_SOCKET){
-         closesocket(peer_sock);
-         connected = false;
-     }
+    if(peer_sock != INVALID_SOCKET){
+        closesocket(peer_sock);
+        connected = false;
+    }
 }
 
 SOCKET Connection::getpeer_sock()
