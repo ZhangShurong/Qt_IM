@@ -5,22 +5,17 @@
 #include <iostream>
 #include <thread>
 #include <windows.h>
+#include <QApplication>
 using namespace std;
-int main() {
-    thread t([]
-    {
-        Sleep(10);
-        test();
-    }
-    );
-    t.detach();
-
-    User *self = new User(0);
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    User *self = new User("0");
     IMClient *im = &IMClient::Instance(self);
     cout << im->getCurrID() << endl;
 
     IMServerLocal imserver("1024");
     imserver.start();
 
-    return 0;
+    return a.exec();
 }

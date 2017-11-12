@@ -19,8 +19,10 @@ class Conversation : public QObject
     unsigned int unread_count;
 public:
     void addMsg(string msg);
+    string getPeerID();
 public:
     Conversation(User* peer_user);
+    void setConn(Connection *newconn);
 };
 
 #endif // CONVERSATION_H

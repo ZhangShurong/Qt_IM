@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <string>
+#include <QTimer>
+#include <QMutex>
+#include <QDebug>
 #include "protocol/jspp.h"
 using std::string;
 using std::vector;
@@ -16,16 +19,19 @@ class IMClient : public QObject
     vector<Conversation *> conv_vec;
     vector<Connection *> unkown_conn;
     User *self;
+    QTimer *timer;
+    QMutex unkown_conn_mutex;
 public:
-    int sendMsg(unsigned int peer_id);
+    int sendMsg(string peer_id);
     static IMClient& Instance(User *user) {
             static IMClient client(user);
             return client;
     }
-    int getCurrID();
+    string getCurrID();
     void newConnection(Connection *newConn);
 public slots:
     void recvMsg(JSPP msg);
+
 private:
     IMClient() = delete;
     IMClient(User *user);                            // ctor hidden
@@ -33,6 +39,8 @@ private:
     IMClient& operator=(IMClient const&) = delete; // assign op. hidden
     ~IMClient();// dtor hidden
     Conversation* createConversation(User *friend_user);
+private slots:
+    void mergeConn();
 };
 
 #endif // IMCLIENT_H

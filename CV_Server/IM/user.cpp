@@ -1,6 +1,6 @@
 #include "user.h"
 
-User::User(unsigned int id)
+User::User(string id)
     :id(id)
 {
 

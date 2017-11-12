@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <string>
+#include <QThread>
 #include "protocol/jspp.h"
 #include "utils/utils.h"
 
@@ -17,15 +18,27 @@ private:
     IMClient *im;
     string port;
     SOCKET ListenSocket;
+    QThread workerThread;
     bool initSock();
     void linkSignalWithSlot();
     bool winsockStarted;
     void stop();
-    void msg_distribution(SOCKET ClientSocket);
+signals:
+    void newConn(SOCKET ClientSocket);
 public:
     IMServerLocal(string port);
     int start();
     ~IMServerLocal();
+};
+
+class Worker : public QObject
+{
+    Q_OBJECT
+public slots:
+    void msg_distribution(SOCKET ClientSocket);
+
+signals:
+    void resultReady(const QString &result);
 };
 
 #endif // IMSERVERLOCAL_H

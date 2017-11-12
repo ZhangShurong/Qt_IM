@@ -8,7 +8,7 @@
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
-    im = &IMClient::Instance(new User(2));
+    im = &IMClient::Instance(new User("2"));
     std::cout << im->getCurrID() << std::endl;
     WSADATA WSAData = {0};
     int status = WSAStartup(MAKEWORD(2, 0), &WSAData);
@@ -18,6 +18,7 @@ IMServerLocal::IMServerLocal(string port)
         winsockStarted = true;
     initSock();
     linkSignalWithSlot();
+    qRegisterMetaType<SOCKET>("SOCKET");
 }
 int IMServerLocal::start()
 {
@@ -25,19 +26,14 @@ int IMServerLocal::start()
         SOCKET ClientSocket = INVALID_SOCKET;
         // Accept a client socket
         ClientSocket = accept(ListenSocket, NULL, NULL);
-        std::thread t([=]{
-            if (ClientSocket == INVALID_SOCKET) {
-                printf("accept failed with error: %d\n", WSAGetLastError());
-                closesocket(ListenSocket);
-                WSACleanup();
-                return 1;
-            }
-            else {
-                msg_distribution(ClientSocket);
-            }
+        if (ClientSocket == INVALID_SOCKET) {
+            printf("accept failed with error: %d\n", WSAGetLastError());
+            closesocket(ListenSocket);
+            return 1;
         }
-        );
-        t.detach();
+        else {
+            emit newConn(ClientSocket);
+        }
     }
 
     return 0;
@@ -46,16 +42,15 @@ int IMServerLocal::start()
 IMServerLocal::~IMServerLocal()
 {
     stop();
-
     if (winsockStarted)
         WSACleanup();
 }
 
-void IMServerLocal::msg_distribution(SOCKET ClientSocket)
+void Worker::msg_distribution(SOCKET ClientSocket)
 {
     Connection *conn = new Connection(ClientSocket);
-    im->newConnection(conn);
-     //消息在这里集中解析分发
+    IMClient::Instance(nullptr).newConnection(conn);
+    //消息在这里集中解析分发
 }
 
 
@@ -109,7 +104,11 @@ bool IMServerLocal::initSock()
 
 void IMServerLocal::linkSignalWithSlot()
 {
-
+    Worker *worker = new Worker;
+    worker->moveToThread(&workerThread);
+    connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &IMServerLocal::newConn, worker, &Worker::msg_distribution);
+    workerThread.start();
 }
 void IMServerLocal::stop()
 {
@@ -119,4 +118,5 @@ void IMServerLocal::stop()
         ListenSocket = INVALID_SOCKET;
     }
 }
+
 
