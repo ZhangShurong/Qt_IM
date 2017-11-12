@@ -12,9 +12,9 @@ SOURCES += main.cpp \
     utils/jsoncpp/json_writer.cpp \
     test.cpp \
     IM/connection.cpp \
-    IM/im_socket.cpp \
+    #IM/im_socket.cpp \
     IM/imserver_local.cpp \
-    IM/friend.cpp \
+    #IM/friend.cpp \
     IM/imclient.cpp \
     IM/conversation.cpp \
     protocol/jspp.cpp \
@@ -39,9 +39,9 @@ HEADERS += \
     utils/thread_pool.h \
     test.h \
     IM/connection.h \
-    IM/im_socket.h \
+    #IM/im_socket.h \
     IM/imserver_local.h \
-    IM/friend.h \
+    #IM/friend.h \
     IM/imclient.h \
     IM/conversation.h \
     protocol/jspp.h \
