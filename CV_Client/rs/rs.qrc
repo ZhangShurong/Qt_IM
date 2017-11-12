@@ -1,0 +1,78 @@
+<RCC>
+    <qresource prefix="/sys">
+        <file>img/sf.jpg</file>
+        <file>img/check.png</file>
+        <file>img/top.png</file>
+        <file>img/keyborad.png</file>
+        <file>search.png</file>
+        <file>arrow_d.png</file>
+        <file>arrow_r.png</file>
+        <file>arrow_r_g.png</file>
+        <file>back.png</file>
+        <file>qlogo.png</file>
+        <file>qqicon_p_blue.png</file>
+        <file>qqicon_p_gray.png</file>
+        <file>qqicon_q_blue.png</file>
+        <file>qqicon_q_gray.png</file>
+        <file>qqicon_t_blue.png</file>
+        <file>qqicon_t_gray.png</file>
+        <file>qq_tool_mail.png</file>
+        <file>qq_tool_skin.png</file>
+        <file>qq_tool_talk.png</file>
+        <file>qq_tool_zone.png</file>
+        <file>level.png</file>
+        <file>color_panle.png</file>
+    </qresource>
+    <qresource prefix="/media/qun">
+        <file>media/qun/1.png</file>
+        <file>media/qun/2.png</file>
+        <file>media/qun/3.png</file>
+        <file>media/qun/4.png</file>
+    </qresource>
+    <qresource prefix="/media/person">
+        <file>media/person/1.jpg</file>
+        <file>media/person/2.jpg</file>
+        <file>media/person/3.jpg</file>
+        <file>media/person/4.jpg</file>
+        <file>media/person/5.jpg</file>
+        <file>media/person/6.jpg</file>
+        <file>media/person/7.jpg</file>
+        <file>media/person/8.jpg</file>
+    </qresource>
+    <qresource prefix="/media/wether">
+        <file>media/wether/1.png</file>
+        <file>media/wether/2.png</file>
+        <file>media/wether/3.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>images/10.jpeg</file>
+        <file>images/11.jpg</file>
+        <file>images/3.png</file>
+        <file>images/4.png</file>
+        <file>images/A26.png</file>
+        <file>images/A26_2.png</file>
+        <file>images/blue70-2.gif</file>
+        <file>images/contact_green.png</file>
+        <file>images/contact_white.png</file>
+        <file>images/emotion26.png</file>
+        <file>images/emotion26_2.png</file>
+        <file>images/friendmsg.png</file>
+        <file>images/kobe_1.jpg</file>
+        <file>images/monments_green.png</file>
+        <file>images/monments_white.png</file>
+        <file>images/myappico.ico</file>
+        <file>images/myicon_1.png</file>
+        <file>images/myicon_2.png</file>
+        <file>images/myicon_3.png</file>
+        <file>images/personman.png</file>
+        <file>images/purple0.4.gif</file>
+        <file>images/QQgreen.png</file>
+        <file>images/QQwhite.png</file>
+        <file>images/red69-2.gif</file>
+        <file>images/school.jpg</file>
+        <file>images/searchlogo52_23.png</file>
+        <file>images/sunshine.jpg</file>
+        <file>images/touxiang01.jpg</file>
+        <file>images/touxiang02.jpg</file>
+    </qresource>
+</RCC>

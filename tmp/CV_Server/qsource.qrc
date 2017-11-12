@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/3.png</file>
+        <file>images/4.png</file>
+        <file>images/10.jpeg</file>
+        <file>images/11.jpg</file>
+        <file>images/A26.png</file>
+        <file>images/A26_2.png</file>
+        <file>images/blue70-2.gif</file>
+        <file>images/contact_green.png</file>
+        <file>images/contact_white.png</file>
+        <file>images/emotion26.png</file>
+        <file>images/emotion26_2.png</file>
+        <file>images/friendmsg.png</file>
+        <file>images/kobe_1.jpg</file>
+        <file>images/monments_green.png</file>
+        <file>images/monments_white.png</file>
+        <file>images/myappico.ico</file>
+        <file>images/myicon_1.png</file>
+        <file>images/myicon_2.png</file>
+        <file>images/myicon_3.png</file>
+        <file>images/personman.png</file>
+        <file>images/purple0.4.gif</file>
+        <file>images/QQgreen.png</file>
+        <file>images/QQwhite.png</file>
+        <file>images/red69-2.gif</file>
+        <file>images/school.jpg</file>
+        <file>images/searchlogo52_23.png</file>
+        <file>images/sunshine.jpg</file>
+        <file>images/touxiang01.jpg</file>
+        <file>images/touxiang02.jpg</file>
+    </qresource>
+</RCC>
