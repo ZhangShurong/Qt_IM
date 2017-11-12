@@ -35,7 +35,7 @@ void IMClient::mergeConn()
     unkown_conn_mutex.unlock();
 }
 
-int IMClient::sendMsg(string peer_id, std::__cxx11::string msg)
+int IMClient::sendMsg(string peer_id, string msg)
 {
     std::cout  << peer_id << std::endl;
     for(size_t i = 0; i < conv_vec.size(); ++i) {

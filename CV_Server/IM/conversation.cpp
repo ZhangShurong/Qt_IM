@@ -11,7 +11,7 @@
 //    std::cout << "unread_count is " << unread_count << std::endl;
 //}
 
-void Conversation::sendMsg(std::__cxx11::string msg)
+void Conversation::sendMsg(string msg)
 {
     std::cout << msg << std::endl;
     if(!conn){

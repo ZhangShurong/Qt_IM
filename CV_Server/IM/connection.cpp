@@ -138,7 +138,7 @@ int Connection::connectToPeer()
 /*
  * 发送消息，从unsend_vector中读数据
  */
-void Connection::send_msg(std::__cxx11::string msg)
+void Connection::send_msg(string msg)
 {
 //    if(unsend_msg_vec.size() ==  0)
 //        return;
@@ -202,7 +202,7 @@ string Connection::getPeerid()
     return peer_id;
 }
 
-void Connection::setPeer_id(std::__cxx11::string id)
+void Connection::setPeer_id(string id)
 {
     peer_id = id;
 }
