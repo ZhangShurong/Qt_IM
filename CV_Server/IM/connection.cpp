@@ -49,7 +49,7 @@ void Connection::recv_msg()
     if(peer_sock == INVALID_SOCKET)
         return;
     int iResult;
-    char recvbuf[LINE_BUF];
+    char recvbuf[LINE_BUF] = {0};
     int recvbuflen = LINE_BUF;
     connected = true;
     do {
