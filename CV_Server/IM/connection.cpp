@@ -55,12 +55,12 @@ void Connection::recv_msg()
     do {
         iResult = recv(peer_sock, recvbuf, recvbuflen, 0);
         if (iResult > 0) {
-            printf("Bytes received: %d\n", iResult);
+
             JSPP msg = parse(string(recvbuf));
             if(peer_id == "") {
                 peer_id = msg.from;
             }
-            std::cout << msg.body << std::endl;
+            printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());
             unread_msg_vec.push_back(msg);
         }
         else if (iResult == 0)
@@ -138,18 +138,15 @@ int Connection::connectToPeer()
 /*
  * 发送消息，从unsend_vector中读数据
  */
-void Connection::send_msg()
+void Connection::send_msg(std::__cxx11::string msg)
 {
+//    if(unsend_msg_vec.size() ==  0)
+//        return;
     if(self_sock == INVALID_SOCKET){
         connectToPeer();
     }
-    string send_str =
-            "{\"type\": \"chat\","
-            "\"to\": \""
-          "CV"
-            "\","
-            "\"from\": \"zsr\","
-            "\"body\": \"I love You too\"}";
+    string send_str = msg;
+
     const char *sendbuf = send_str.c_str();
     // Send an initial buffer
     int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
@@ -163,14 +160,13 @@ void Connection::send_msg()
     printf("Bytes Sent: %ld\n", iResult);
 
     // shutdown the connection since no more data will be sent
-    iResult = shutdown(self_sock, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(self_sock);
-        self_sock = INVALID_SOCKET;
-        return ;
-    }
-
+//    iResult = shutdown(self_sock, SD_SEND);
+//    if (iResult == SOCKET_ERROR) {
+//        printf("shutdown failed with error: %d\n", WSAGetLastError());
+//        closesocket(self_sock);
+//        self_sock = INVALID_SOCKET;
+//        return ;
+//    }
 }
 
 void Connection::linksigSlot()
@@ -204,6 +200,11 @@ JSPP Connection::popMsg()
 string Connection::getPeerid()
 {
     return peer_id;
+}
+
+void Connection::setPeer_id(std::__cxx11::string id)
+{
+    peer_id = id;
 }
 
 size_t Connection::getUnsendCount()

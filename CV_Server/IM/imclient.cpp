@@ -35,17 +35,17 @@ void IMClient::mergeConn()
     unkown_conn_mutex.unlock();
 }
 
-int IMClient::sendMsg(string peer_id)
+int IMClient::sendMsg(string peer_id, std::__cxx11::string msg)
 {
     std::cout  << peer_id << std::endl;
     for(size_t i = 0; i < conv_vec.size(); ++i) {
         if(conv_vec.at(i)->getPeerID() == peer_id){
-            conv_vec.at(i)->sendMsg("Send Interface");
+            conv_vec.at(i)->sendMsg(msg);
             return 0;
         }
     }
     createConversation(new User(peer_id));
-    conv_vec.back()->sendMsg("Send Interface");
+    conv_vec.back()->sendMsg(msg);
     return 0;
 }
 

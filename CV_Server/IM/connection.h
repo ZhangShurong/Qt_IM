@@ -37,13 +37,14 @@ public:
     int pushMsg(JSPP msg);
     JSPP popMsg();
     string getPeerid();
+    void setPeer_id(string id);
     size_t getUnsendCount();
     size_t getUnreadCount();
     void closeSock();
     SOCKET getpeer_sock();
     vector<JSPP> unread_msg_vec;
     vector<JSPP> unsend_msg_vec;
-    void send_msg();//暂时公开用作测试
+    void send_msg(string msg);//暂时公开用作测试
 };
 
 #endif // CONNECTION_H

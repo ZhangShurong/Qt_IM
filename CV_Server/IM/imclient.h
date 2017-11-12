@@ -22,7 +22,7 @@ class IMClient : public QObject
     QTimer *timer;
     QMutex unkown_conn_mutex;
 public:
-    int sendMsg(string peer_id);
+    int sendMsg(string peer_id, string msg);
     static IMClient& Instance(User *user) {
             static IMClient client(user);
             return client;

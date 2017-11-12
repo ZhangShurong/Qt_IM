@@ -14,9 +14,12 @@
 void Conversation::sendMsg(std::__cxx11::string msg)
 {
     std::cout << msg << std::endl;
-    if(!conn)
+    if(!conn){
         conn = new Connection();
-    conn->send_msg();
+        conn->setPeer_id(peer_user->getID());
+    }
+
+    conn->send_msg(msg);
 
 }
 

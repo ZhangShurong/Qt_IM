@@ -12,22 +12,28 @@ class ServerThread : public QThread
 protected:
     void run()
     {
-       IMServerLocal iMServerLocal("1024");
-       iMServerLocal.start();
+        IMServerLocal iMServerLocal("1024");
+        iMServerLocal.start();
     }
 };
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    User *self = new User("0");
+    User *self = new User("CV");
     IMClient *im = &IMClient::Instance(self);
     cout << im->getCurrID() << endl;
 
     ServerThread serverThread;
     serverThread.start();
-while(1){
-    im->sendMsg("CV");
-    Sleep(5000);
-}
+    while(1){
+        string m = "{\"type\": \"chat\","
+                   "\"to\": \""
+                   "CV"
+                   "\","
+                   "\"from\": \"zsr\","
+                   "\"body\": \"I love You\"}";
+        im->sendMsg("CV",m);
+        Sleep(5000);
+    }
     return a.exec();
 }
