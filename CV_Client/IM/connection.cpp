@@ -9,6 +9,7 @@ Connection::Connection()
     timer = new QTimer(this);
     peer_id = "";
     self_id = "";
+    im = &IMClient::Instance();
     linksigSlot();
 
 }
@@ -27,6 +28,7 @@ Connection::Connection(SOCKET sock)
     timer = new QTimer(this);
     peer_id = "";
     self_id = "";
+    im = &IMClient::Instance();
     linksigSlot();
 }
 
@@ -61,7 +63,7 @@ void Connection::recv_msg()
                 peer_id = msg.from;
             }
             printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());
-            unread_msg_vec.push_back(msg);
+            im->pushMsg(msg);
         }
         else if (iResult == 0)
             printf("Connection closing...\n");
@@ -99,7 +101,7 @@ int Connection::connectToPeer()
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    iResult = getaddrinfo("127.0.0.1", "1024", &hints, &result);
+    iResult = getaddrinfo("127.0.0.1", "1314", &hints, &result);
     if ( iResult != 0 ) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         return 1;
@@ -159,7 +161,7 @@ void Connection::send_msg(string msg)
 
     printf("Bytes Sent: %ld\n", iResult);
 
-    // shutdown the connection since no more data will be sent
+//    shutdown the since no more data will be sent
 //    iResult = shutdown(self_sock, SD_SEND);
 //    if (iResult == SOCKET_ERROR) {
 //        printf("shutdown failed with error: %d\n", WSAGetLastError());
@@ -177,23 +179,27 @@ void Connection::linksigSlot()
 
 void Connection::checkQueue()
 {
+
     if(!connected)
         recv_msg();
-    //send_msg();
 }
 
 int Connection::pushMsg(JSPP msg)
 {
-    unsend_msg_vec.push_back(msg);
+    im->pushMsg(msg);
+    return 0;
 }
 
 JSPP Connection::popMsg()
 {
     JSPP msg;
-    if(unread_msg_vec.size() > 0) {
-        msg = unread_msg_vec.back();
-        unread_msg_vec.pop_back();
+
+    /*
+    if(im->unread_msg_list.size() > 0) {
+        msg = im->unread_msg_list.back();
+        im->unread_msg_list.pop_back();
     }
+    */
     return msg;
 }
 
@@ -207,14 +213,16 @@ void Connection::setPeer_id(string id)
     peer_id = id;
 }
 
-size_t Connection::getUnsendCount()
+ size_t Connection::getUnsendCount()
 {
-    return unsend_msg_vec.size();
+     //todo 此接口的作用
+    //return im->unsend_msg_vec.size();
+     return 0;
 }
 
-size_t Connection::getUnreadCount()
+  size_t Connection::getUnreadCount()
 {
-    return unread_msg_vec.size();
+    return im->getUnreadMsg(peer_id).size();
 }
 
 void Connection::closeSock()

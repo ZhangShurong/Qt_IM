@@ -18,11 +18,12 @@ class Conversation : public QObject
     vector<string> msg_vec;//暂时这样储存消息
     unsigned int unread_count;
 public:
-    void sendMsg(string msg);
+    void sendMsg(string msg);//组装成字符串
     string getPeerID();
 public:
     Conversation(User* peer_user);
     void setConn(Connection *newconn);
+    Connection *getConn();
 };
 
 #endif // CONVERSATION_H

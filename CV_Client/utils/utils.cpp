@@ -24,3 +24,17 @@ JSPP parse(string json_str)
     }
     return jspp_msg;
 }
+
+string jspp_to_str(const JSPP msg_json)
+{
+    QJsonObject json;
+    json.insert(QString("type"), QString::fromStdString(msg_json.type));
+    json.insert(QString("to"), QString::fromStdString(msg_json.to));
+    json.insert(QString("from"), QString::fromStdString(msg_json.from));
+    json.insert(QString("body"), QString::fromStdString(msg_json.body));
+    QJsonDocument document;
+    document.setObject(json);
+    QByteArray byteArray = document.toJson(QJsonDocument::Compact);
+    QString strJson(byteArray);
+    return strJson.toStdString();
+}

@@ -6,31 +6,89 @@
 #include "user.h"
 Conversation *IMClient::createConversation(User *friend_user)
 {
+    unkown_conn_mutex.lock();
     Conversation *t = new Conversation(friend_user);
     conv_vec.push_back(t);
+    unkown_conn_mutex.unlock();
 }
 
-void IMClient::mergeConn()
+Conversation *IMClient::getConversation(std::string peer_id)
 {
     unkown_conn_mutex.lock();
-    if(unkown_conn.size() == 0)
-        return;
     std::map<string, size_t> index;
     for(size_t i = 0;i < conv_vec.size();++i) {
         index[conv_vec.at(i)->getPeerID()] = i;
     }
-    for(Connection *connitem : unkown_conn) {
-        string p_id = connitem->getPeerid();
+    std::map<string,size_t>::iterator it = index.find(peer_id);
+    if (it != index.end()){
+        unkown_conn_mutex.unlock();
+        return conv_vec.at(index[peer_id]);
+    }
+    else{
+        unkown_conn_mutex.unlock();
+        createConversation(new User(peer_id));
+        return conv_vec.back();
+    }
+    unkown_conn_mutex.unlock();
+}
+
+void IMClient::pushMsg(JSPP msg)
+{
+    msg_mutex.lock();
+    unread_msg_list.push_back(msg);
+    msg_mutex.unlock();
+}
+
+vector<JSPP> IMClient::getUnreadMsg(std::string peer_id)
+{
+    msg_mutex.lock();
+
+    vector<JSPP> result;
+    for(auto iter = unread_msg_list.begin();
+        iter != unread_msg_list.end();) {
+        list<JSPP>::iterator iter_erase = iter ++;
+        if(iter_erase->from == peer_id) {
+            result.push_back(*iter_erase);
+            unread_msg_list.erase(iter_erase);
+        }
+    }
+    msg_mutex.unlock();
+    return result;
+}
+
+
+void IMClient::mergeConn()
+{
+    unkown_conn_mutex.lock();
+    qDebug() << "unkown_conn size is" << unkown_conn.size();
+    qDebug() << "conve size is" << conv_vec.size();
+    if(unkown_conn.size() == 0){
+        unkown_conn_mutex.unlock();
+        return;
+    }
+
+    std::map<string, size_t> index;
+    for(size_t i = 0;i < conv_vec.size();++i) {
+        index[conv_vec.at(i)->getPeerID()] = i;
+    }
+    for(list<Connection *>::iterator iter = unkown_conn.begin();
+        iter != unkown_conn.end();)
+    {
+        list<Connection *>::iterator iter_erase = iter ++;
+        string p_id = (*iter_erase)->getPeerid();
         if(p_id == "")
             continue;
         std::map<string,size_t>::iterator it = index.find(p_id);
-        if (it != index.end())
-            conv_vec.at(index[p_id])->setConn(connitem);
+        if (it != index.end()){
+            conv_vec.at(index[p_id])->setConn(*iter_erase);
+        }
         else{
             createConversation(new User(p_id));
-            conv_vec.back()->setConn(connitem);
+            conv_vec.back()->setConn(*iter_erase);
         }
+        unkown_conn.erase(iter_erase);
     }
+
     qDebug() << " Now we have " <<conv_vec.size() << " Conversation";
     unkown_conn_mutex.unlock();
 }
@@ -58,6 +116,8 @@ void IMClient::newConnection(Connection *newConn)
 {
     unkown_conn_mutex.lock();
     unkown_conn.push_back(newConn);
+    qDebug() << "unkown_conn size is" << unkown_conn.size();
+    qDebug() << "conve size is" << conv_vec.size();
     unkown_conn_mutex.unlock();
 }
 
@@ -69,12 +129,9 @@ void IMClient::recvMsg(JSPP msg)
 IMClient::IMClient(User *user)
 {
     self = user;
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(mergeConn()));
-    timer->start(100);
 }
 
 IMClient::~IMClient()
 {
-    delete timer;
+    //delete timer;
 }

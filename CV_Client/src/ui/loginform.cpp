@@ -13,13 +13,12 @@ LoginForm::LoginForm(QWidget *parent) :
 
     //关联登录按钮点击
     connect(ui->pushButton_login,SIGNAL(clicked()),this,SLOT(doLoginButClick()));
-
-    ServerThread *worker = new ServerThread;
-    worker->moveToThread(&serverThread);
-    connect(&serverThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &LoginForm::readyForServer, worker, &ServerThread::runServer);
-    serverThread.start();
-
+    ServerWorker *worker = new ServerWorker;
+    serverThread = new QThread();
+    worker->moveToThread(serverThread);
+    connect(serverThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &LoginForm::readyForServer, worker, &ServerWorker::runServer);
+    serverThread->start();
 }
 
 LoginForm::~LoginForm()
@@ -36,8 +35,12 @@ QWidget *LoginForm::getDragnWidget()
 
 void LoginForm::doLoginButClick()
 {
-
     emit readyForServer();
+    //todo 此处设计有误，如有时间，应修改。
+    Sleep(1000);
+    timer = new QTimer();
+    connect(timer, SIGNAL(timeout()), this, SLOT(connManage()));
+    timer->start(1000);
 
     MainForm*m=new MainForm;
     m->show();
@@ -45,14 +48,10 @@ void LoginForm::doLoginButClick()
 
 }
 
+void LoginForm::connManage()
+{
+    IMClient::Instance().mergeConn();
+}
 
-//class ServerThread : public QThread
-//{
-//protected:
-//    void run()
-//    {
-//        IMServerLocal iMServerLocal("1024");
-//        iMServerLocal.start();
-//    }
-//};
+
 

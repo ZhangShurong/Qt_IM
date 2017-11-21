@@ -38,6 +38,8 @@
         <file>media/person/6.jpg</file>
         <file>media/person/7.jpg</file>
         <file>media/person/8.jpg</file>
+        <file>media/person/9.jpg</file>
+        <file>media/person/10.jpg</file>
     </qresource>
     <qresource prefix="/media/wether">
         <file>media/wether/1.png</file>

@@ -30,14 +30,16 @@ private slots:
      * @brief 登录按钮点击
      */
     void doLoginButClick();
+    void connManage();
 signals:
     void readyForServer();
 private:
     Ui::LoginForm *ui;
-    QThread serverThread;
+    QThread *serverThread;
+    QTimer *timer;
 };
 
-class ServerThread : public QObject
+class ServerWorker : public QObject
 {
     Q_OBJECT
 public slots:

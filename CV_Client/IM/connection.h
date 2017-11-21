@@ -9,6 +9,8 @@
 #include "utils/utils.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "IM/imclient.h"
+
 #define LINE_BUF 2048
 using std::string;
 using std::vector;
@@ -27,6 +29,11 @@ private:
     int connectToPeer();
 
     void linksigSlot();
+    IMClient *im;
+    /*
+signals:
+    void msgRecived(vector<JSPP> msg);
+    */
 private slots:
     void checkQueue();
 public:
@@ -42,8 +49,7 @@ public:
     size_t getUnreadCount();
     void closeSock();
     SOCKET getpeer_sock();
-    vector<JSPP> unread_msg_vec;
-    vector<JSPP> unsend_msg_vec;
+
     void send_msg(string msg);//暂时公开用作测试
 };
 

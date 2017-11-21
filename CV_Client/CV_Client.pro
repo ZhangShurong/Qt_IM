@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     utils/jsoncpp/json_valueiterator.inl \
     utils/jsoncpp/json_writer.cpp \
     utils/utils.cpp \
-    test.cpp
+    test.cpp \
+    IM/msgpool.cpp
 
 HEADERS  += \
     src/ui/loginform.h \
@@ -76,7 +77,8 @@ HEADERS  += \
     utils/jsoncpp/writer.h \
     utils/thread_pool.h \
     utils/utils.h \
-    test.h
+    test.h \
+    IM/msgpool.h
 
 FORMS    += \
     src/ui/loginform.ui \

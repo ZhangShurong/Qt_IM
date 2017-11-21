@@ -15,13 +15,14 @@ CollapseViewItem::CollapseViewItem(QString titleText, QWidget *parent) :
     ui->setupUi(this);
     ui->label->setProperty("slected",!ui->item_con->isVisible());
 
-
+    //todo 从服务器拉取好友
+    QString picPath=QString(":/media/person/media/person/10.jpg");
+    addSubItem(new LitterIem(picPath,"vergilzhang",this));
+ /*
     //根据时间制作随机种子
     QTime time;
     time= QTime::currentTime();
     qsrand(time.msec()+time.second()*1000);
-
-
     //随机产生好友数目
     int personNumber=qrand()%(MAX_PERSON_PIC_NUM-1)+1;
 
@@ -41,8 +42,9 @@ CollapseViewItem::CollapseViewItem(QString titleText, QWidget *parent) :
     titleText=QString("%1 (%2/%3)")
             .arg(titleText,QString::number(offlinPerson),QString::number(personNumber));
 
-    this->setTitleText(titleText);
 
+    this->setTitleText(titleText);
+*/
 
     connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(onCollapseButClick()));
 

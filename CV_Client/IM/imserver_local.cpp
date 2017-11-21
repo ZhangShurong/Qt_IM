@@ -8,7 +8,7 @@
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
-    im = &IMClient::Instance(new User("2"));
+    im = &IMClient::Instance();
     std::cout << im->getCurrID() << std::endl;
     WSADATA WSAData = {0};
     int status = WSAStartup(MAKEWORD(2, 0), &WSAData);
@@ -50,7 +50,7 @@ IMServerLocal::~IMServerLocal()
 void Distributor::msg_distribution(SOCKET ClientSocket)
 {
     Connection *conn = new Connection(ClientSocket);
-    IMClient::Instance(nullptr).newConnection(conn);
+    IMClient::Instance().newConnection(conn);
     //消息在这里集中解析分发
 }
 
