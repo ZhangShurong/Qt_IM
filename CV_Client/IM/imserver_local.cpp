@@ -49,8 +49,35 @@ IMServerLocal::~IMServerLocal()
 
 void Distributor::msg_distribution(SOCKET ClientSocket)
 {
-    Connection *conn = new Connection(ClientSocket);
-    IMClient::Instance().newConnection(conn);
+    if(ClientSocket == INVALID_SOCKET)
+        return;
+    IMClient *im = &IMClient::Instance();
+    int iResult;
+    char recvbuf[LINE_BUF] = {0};
+    int recvbuflen = LINE_BUF;
+    do {
+        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+        if (iResult > 0) {
+            JSPP msg = parse(string(recvbuf));
+            printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());
+            im->pushMsg(msg);
+        }
+        else if (iResult == 0)
+            printf("Connection closing...\n");
+        else  {
+            printf("recv failed with error: %d\n", WSAGetLastError());
+            closesocket(ClientSocket);
+            break ;
+        }
+    } while (iResult > 0);
+
+    // shutdown the connection since we're done
+    iResult = shutdown(ClientSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed with error: %d\n", WSAGetLastError());
+        closesocket(ClientSocket);
+    }
+    closesocket(ClientSocket);
     //消息在这里集中解析分发
 }
 

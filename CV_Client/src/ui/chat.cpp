@@ -3,6 +3,10 @@
 #include <QDesktopWidget>
 #include "IM/imclient.h"
 #include "IM/connection.h"
+#include <QUdpSocket>
+#include "dialogrec.h"
+#include <strstream>
+using std::strstream;
 
 Chat::Chat(QWidget *parent, User *peer_user) :
     QWidget(parent),
@@ -13,16 +17,18 @@ Chat::Chat(QWidget *parent, User *peer_user) :
     setAttribute(Qt::WA_TranslucentBackground);
     ui->label_4->installEventFilter(this);
     ui->label_5->installEventFilter(this);
+    ui->nameLabel->setText(QString::fromStdString(peer_user->getID()));
     QFile file(":/myqss/scrollbar.qss");
     file.open(QFile::ReadOnly);
     ui->textBrowser->verticalScrollBar()->setStyleSheet(file.readAll());
     ui->label_8->installEventFilter(this);
     move((QApplication::desktop()->width() - width())/2,(QApplication::desktop()->height() - height()-20)/2);
-    conv = nullptr;
+    //conv = nullptr;
     this->peer_user = peer_user;
     timer  = new QTimer();
-    //    emotion=new Emotion();
-    //    connect(emotion,SIGNAL(imgurl(QString)),this,SLOT(sendemotion(QString)));
+
+    dia = new DialogRec();
+    setIP_port();
 }
 
 Chat::~Chat()
@@ -80,20 +86,18 @@ bool Chat::eventFilter(QObject *object, QEvent *e)
 
         qDebug()<<ui->label_8->x();
         qDebug()<<x();
-        //        emotion->move(x()-10,ui->label_8->y()-100);
-        //        emotion->show();
 
     }
     return false;
 }
-
+/*
 void Chat::setConv(Conversation *conv_new)
 {
     if(conv_new)
         conv = conv_new;
     return;
 }
-
+*/
 void Chat::recvMsg(QString msg)
 {
     qDebug()<<msg.length();
@@ -115,14 +119,32 @@ void Chat::recvMsg(QString msg)
 void Chat::recvMsg(vector<JSPP> msg_vec)
 {
     for(JSPP item:msg_vec) {
-        recvMsg(QString::fromStdString(item.body));
+        if(item.type == "chat")
+            recvMsg(QString::fromStdString(item.body));
+        else if(item.type == "file")
+        {
+            if(item.code == "0") {//对方请求发送文件
+                dia->setFileReq(item);
+                dia->show();
+            }
+            else if(item.code == "1") //对方接收文件
+            {
+                QString fileMsg = QString::fromStdString(item.body);
+                QStringList infoList= fileMsg.split("*#*");
+                sendFile(infoList[0], infoList[1]);
+            }
+            else //对方拒绝接收文件
+            {
+                QMessageBox::warning(this,tr("通知"),tr("对方拒绝接收文件！"),QMessageBox::Yes);
+            }
+        }
     }
 }
 void Chat::showEvent(QShowEvent *event)
 {
     mouse_press=false;
-    if(!conv)
-        conv = IMClient::Instance().getConversation(peer_user->getID());
+    // if(!conv)
+    //   conv = IMClient::Instance().getConversation(peer_user->getID());
     connect(timer, SIGNAL(timeout()), this, SLOT(checkMsg()));
     timer->start(100);
 }
@@ -151,6 +173,64 @@ void Chat::on_sndBtn_clicked()
         qDebug()<<s1;
         ui->textBrowser->insertHtml(s1);
     }
-    conv->sendMsg(ui->textEdit->toPlainText().toStdString());
+    IMClient::Instance().sendMsg(peer_user->getID(), content.toStdString());
     ui->textEdit->clear();
+}
+
+void Chat::on_sndFileBtn_clicked()
+{
+    QString fileName=QFileDialog::getOpenFileName(this);
+    qDebug()<<fileName<<endl;
+    if(fileName.isEmpty()){
+        return;
+    }
+
+    JSPP msg;
+    msg.type = "file";
+    msg.body = fileName.toStdString();
+    msg.from = IMClient::Instance().getCurrID();
+    msg.to = peer_user->getID();
+    IMClient::Instance().sendMsg(msg);
+}
+
+void Chat::sendFile(QString fileName, QString fileport)
+{
+    QUdpSocket PicSocket;
+    QHostAddress localaddr1;
+    ssize_t i = 0;
+    if(peer_ip == "")
+            return;
+    localaddr1.setAddress(QString::fromStdString(peer_ip));
+
+    int port;
+    strstream ss;
+    ss << fileport.toStdString();
+    ss >> port;
+
+    QFile file;
+    file.setFileName(fileName);
+    if(!file.open(QIODevice::ReadOnly)) return;
+    while(!file.atEnd()){
+        QByteArray line=file.read(8000);
+        PicSocket.writeDatagram(line,localaddr1,port);
+        i+=line.size();
+    }
+    QByteArray str = "End!";
+    PicSocket.writeDatagram(str.data(),str.size(),localaddr1,port);
+    qDebug() << "size is" << i << "-----";
+    QMessageBox::warning(this,tr("通知"),tr("发送完成"),QMessageBox::Yes);
+}
+
+void Chat::setIP_port()
+{
+    IP_PORT res;
+    if(!IMClient::Instance().getIP_Port(peer_user->getID(), res))
+    {
+        peer_ip = res.address;
+        peer_port = res.port;
+    }
+    else {
+        peer_ip = "";
+        peer_port = "";
+    }
 }

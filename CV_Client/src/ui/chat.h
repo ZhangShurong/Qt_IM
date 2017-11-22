@@ -7,9 +7,12 @@
 #include <QDebug>
 #include <QScrollBar>
 #include <QFile>
-#include "IM/conversation.h"
+#include <QFileDialog>
+//#include "IM/conversation.h"
 #include "IM/user.h"
 #include "protocol/jspp.h"
+#include <QUdpSocket>
+#include "dialogrec.h"
 
 //#include "emotion.h"
 namespace Ui {
@@ -19,9 +22,13 @@ class Chat;
 class Chat : public QWidget
 {
     Q_OBJECT
-    Conversation *conv;
+   // Conversation *conv;
     User *peer_user;
     QTimer *timer;
+    string peer_ip;
+    string peer_port;
+    DialogRec *dia;
+
 
 public:
     explicit Chat(QWidget *parent, User *peer_user);
@@ -36,12 +43,13 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     //最小化及关闭
     bool eventFilter(QObject *object, QEvent *e);
-    void setConv(Conversation *conv_new);
+    //void setConv(Conversation *conv_new);
 
 protected:
     void showEvent(QShowEvent *event);
 
 private slots:
+    //void processPendingDatagrams();
     //void sendemotion(QString s);
     void checkMsg();
 
@@ -50,8 +58,13 @@ private slots:
     void recvMsg(QString msg);
     void recvMsg(vector<JSPP> msg_vec);
 
+    void on_sndFileBtn_clicked();
+    void sendFile(QString fileName, QString fileport);
+
 private:
     Ui::Chat *ui;
+    QFileDialog *fDialog;
+    void setIP_port();
     //Emotion* emotion;
 };
 

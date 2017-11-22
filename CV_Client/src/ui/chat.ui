@@ -45,7 +45,7 @@ border-radius:2px;</string>
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="nameLabel">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -181,7 +181,7 @@ QLabel:hover{
       <x>481</x>
       <y>66</y>
       <width>148</width>
-      <height>521</height>
+      <height>511</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -324,6 +324,35 @@ QPushButton:hover{
     <property name="styleSheet">
      <string notr="true">border:none;
  background:#E7EAF7;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sndFileBtn">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>560</y>
+      <width>61</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>微软雅黑</family>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton{ 
+     background-color: rgb(6,157,213); 
+     border: none;
+     border-radius:2px;
+     color:white;
+}
+QPushButton:hover{ 
+     background-color: rgb(75,202,255);
+}</string>
+    </property>
+    <property name="text">
+     <string>发送文件</string>
     </property>
    </widget>
   </widget>

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <QThread>
 #include <QWidget>
+#include <QTcpSocket>
 
 namespace Ui {
 class LoginForm;
@@ -23,7 +24,6 @@ public:
     ~LoginForm();
 
 protected:
-
       QWidget*getDragnWidget();
 private slots:
     /**
@@ -31,25 +31,37 @@ private slots:
      */
     void doLoginButClick();
     void connManage();
+    void errorSlot();
+
+    void connectedSlot();
+    void readMessage();
+    void doRegisClick();
+
 signals:
-    void readyForServer();
+    void readyForServer(User *self);
 private:
     Ui::LoginForm *ui;
     QThread *serverThread;
     QTimer *timer;
+    QTcpSocket *tcpsocket;
+
+    bool connected;
+    void login(QString userInfo);
+//    void loginOK();
+    void loginOK(User *self, map<string, IP_PORT> user_ip);
 };
 
 class ServerWorker : public QObject
 {
     Q_OBJECT
 public slots:
-    void runServer()
+    void runServer(User *self)
     {
-        User *self = new User("CV");
+        //User *self = new User("CV");
         IMClient *im = &IMClient::Instance(self);
         std::cout << im->getCurrID() << std::endl;
 
-        IMServerLocal iMServerLocal("1024");
+        IMServerLocal iMServerLocal(PORT);
         iMServerLocal.start();
     }
 };

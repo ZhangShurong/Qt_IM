@@ -20,6 +20,7 @@ JSPP parse(string json_str)
             jspp_msg.to = obj["to"].toString().toStdString();
             jspp_msg.from = obj["from"].toString().toStdString();
             jspp_msg.body = obj["body"].toString().toStdString();
+            jspp_msg.code = obj["code"].toString().toStdString();
         }
     }
     return jspp_msg;
@@ -32,6 +33,7 @@ string jspp_to_str(const JSPP msg_json)
     json.insert(QString("to"), QString::fromStdString(msg_json.to));
     json.insert(QString("from"), QString::fromStdString(msg_json.from));
     json.insert(QString("body"), QString::fromStdString(msg_json.body));
+    json.insert(QString("code"), QString::fromStdString(msg_json.code));
     QJsonDocument document;
     document.setObject(json);
     QByteArray byteArray = document.toJson(QJsonDocument::Compact);

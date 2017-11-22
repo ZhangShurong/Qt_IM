@@ -16,16 +16,17 @@ LitterIem::LitterIem(QString picPath, QWidget *parent) :
 
 }
 */
-LitterIem::LitterIem(QString picPath, QString user_id, QWidget *parent):
+LitterIem::LitterIem(QString picPath, User* user, QWidget *parent):
     QWidget(parent),
     ui(new Ui::LitterIem)
 {
     ui->setupUi(this);
     QPixmap p(picPath);
     ui->label_pic->setPixmap(p);
-    user = new User(user_id.toStdString());
+    this->user = user;
     chat_ui = new Chat(0, user);
-    conv = nullptr;
+    ui->label_name->setText(QString::fromStdString(user->getID()));
+    //conv = nullptr;
 }
 
 

@@ -286,7 +286,7 @@
           </font>
          </property>
          <property name="text">
-          <string>it's pass?</string>
+          <string>1314</string>
          </property>
          <property name="echoMode">
           <enum>QLineEdit::Password</enum>
@@ -324,7 +324,7 @@
           </font>
          </property>
          <property name="text">
-          <string>337994130</string>
+          <string>CV</string>
          </property>
         </widget>
         <widget class="QLabel" name="label_touxiang">
@@ -371,7 +371,7 @@
           <bool>true</bool>
          </property>
         </widget>
-        <widget class="QLabel" name="label_1">
+        <widget class="ClickableLabel" name="reglabel">
          <property name="geometry">
           <rect>
            <x>340</x>
@@ -404,6 +404,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>src\ui\clickablelabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../rs/rs.qrc"/>
  </resources>

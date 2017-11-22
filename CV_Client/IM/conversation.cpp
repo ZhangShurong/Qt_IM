@@ -4,13 +4,6 @@
 #include "imclient.h"
 #include <iostream>
 
-//void Conversation::addMsg(string msg)
-//{
-//    msg_vec.push_back(msg);
-//    std::cout << msg << std::endl;
-//    unread_count ++;
-//    std::cout << "unread_count is " << unread_count << std::endl;
-//}
 
 void Conversation::sendMsg(string msg)
 {

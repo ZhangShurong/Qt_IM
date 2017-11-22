@@ -33,8 +33,11 @@ MainForm::MainForm(QWidget *parent) :
     //转移到右边
     this->move(screenWidth-MAIN_FORM_OADDING-this->width(),MAIN_FORM_OADDING);
 
+}
 
-
+void MainForm::setNick(QString nick)
+{
+    ui->label_nick->setText(nick);
 }
 
 MainForm::~MainForm()

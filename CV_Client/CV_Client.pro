@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 CONFIG += console c++11
 
 LIBS += -lws2_32
@@ -24,23 +24,16 @@ SOURCES += main.cpp\
     src/model/singleton.cpp \
     src/ui/colorpickform.cpp \
     src/model/config.cpp \
-    IM/connection.cpp \
-    IM/conversation.cpp \
-    IM/friend.cpp \
-    IM/im_socket.cpp \
     IM/imclient.cpp \
     IM/imserver_local.cpp \
     IM/user.cpp \
     protocol/jspp.cpp \
     src/ui/chat.cpp \
     src/ui/slidewindow.cpp \
-    utils/jsoncpp/json_reader.cpp \
-    utils/jsoncpp/json_value.cpp \
-    utils/jsoncpp/json_valueiterator.inl \
-    utils/jsoncpp/json_writer.cpp \
     utils/utils.cpp \
-    test.cpp \
-    IM/msgpool.cpp
+    src/ui/dialogrec.cpp \
+    src/ui/regisdialog.cpp \
+    src/ui/clickablelabel.cpp
 
 HEADERS  += \
     src/ui/loginform.h \
@@ -52,33 +45,17 @@ HEADERS  += \
     src/model/singleton.h \
     src/ui/colorpickform.h \
     src/model/config.h \
-    IM/connection.h \
-    IM/conversation.h \
-    IM/friend.h \
-    IM/im_socket.h \
     IM/imclient.h \
     IM/imserver_local.h \
     IM/user.h \
     protocol/jspp.h \
     src/ui/chat.h \
     src/ui/slidewindow.h \
-    utils/jsoncpp/allocator.h \
-    utils/jsoncpp/assertions.h \
-    utils/jsoncpp/autolink.h \
-    utils/jsoncpp/config.h \
-    utils/jsoncpp/features.h \
-    utils/jsoncpp/forwards.h \
-    utils/jsoncpp/json.h \
-    utils/jsoncpp/json_tool.h \
-    utils/jsoncpp/reader.h \
-    utils/jsoncpp/value.h \
-    utils/jsoncpp/version.h \
-    utils/jsoncpp/version.h.in \
-    utils/jsoncpp/writer.h \
-    utils/thread_pool.h \
     utils/utils.h \
-    test.h \
-    IM/msgpool.h
+    config.h \
+    src/ui/dialogrec.h \
+    src/ui/regisdialog.h \
+    src/ui/clickablelabel.h
 
 FORMS    += \
     src/ui/loginform.ui \
@@ -88,7 +65,9 @@ FORMS    += \
     src/ui/mainform.ui \
     src/ui/colorpickform.ui \
     src/ui/chat.ui \
-    src/ui/slidewindow.ui
+    src/ui/slidewindow.ui \
+    src/ui/dialogrec.ui \
+    src/ui/regisdialog.ui
 
 RESOURCES += \
     rs/rs.qrc

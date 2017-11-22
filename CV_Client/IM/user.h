@@ -5,10 +5,17 @@
 using std::string;
 class Friend;
 class Connection;
+struct IP_PORT
+{
+    string address;
+    string port;
+};
+
 class User {
-    std::vector<User *> friends;
+
     string id;
 public:
+    std::vector<User *> friends;
     User(string id);
     int addFriend(User *user);
     string getID()

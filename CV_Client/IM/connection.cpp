@@ -62,6 +62,7 @@ void Connection::recv_msg()
             if(peer_id == "") {
                 peer_id = msg.from;
             }
+            //im->mergeConn();
             printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());
             im->pushMsg(msg);
         }
@@ -101,7 +102,10 @@ int Connection::connectToPeer()
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    iResult = getaddrinfo("127.0.0.1", "1314", &hints, &result);
+    string add = IP_PORT(im->frient_ip_map[peer_id]).address;
+    string port = IP_PORT(im->frient_ip_map[peer_id]).port;
+
+    iResult = getaddrinfo(add.c_str(), port.c_str(), &hints, &result);
     if ( iResult != 0 ) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         return 1;
@@ -142,8 +146,7 @@ int Connection::connectToPeer()
  */
 void Connection::send_msg(string msg)
 {
-//    if(unsend_msg_vec.size() ==  0)
-//        return;
+
     if(self_sock == INVALID_SOCKET){
         connectToPeer();
     }

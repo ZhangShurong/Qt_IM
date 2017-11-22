@@ -30,10 +30,7 @@ private:
 
     void linksigSlot();
     IMClient *im;
-    /*
-signals:
-    void msgRecived(vector<JSPP> msg);
-    */
+
 private slots:
     void checkQueue();
 public:

@@ -2,7 +2,7 @@
 #include "ui_collapseviewitem.h"
 
 #include "litteriem.h"
-
+#include "IM/imclient.h"
 #include <QDebug>
 #include <QTime>
 
@@ -17,7 +17,11 @@ CollapseViewItem::CollapseViewItem(QString titleText, QWidget *parent) :
 
     //todo 从服务器拉取好友
     QString picPath=QString(":/media/person/media/person/10.jpg");
-    addSubItem(new LitterIem(picPath,"vergilzhang",this));
+    for(User *friendUser : IMClient::Instance().self->friends)
+    {
+        addSubItem(new LitterIem(picPath,friendUser,this));
+    }
+
  /*
     //根据时间制作随机种子
     QTime time;

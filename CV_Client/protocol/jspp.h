@@ -22,8 +22,9 @@ struct JSPP
     string to;
     string id;
     string body;
+    string code;
     Error error;
-    JSPP():type("empty"),from(""),to(""),id(""),body("")
+    JSPP():type("empty"),from(""),to(""),id(""),body(""),code("0")
     {}
 };
 struct Message : public JSPP

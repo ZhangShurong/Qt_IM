@@ -1,7 +1,6 @@
 #ifndef MAINFORM_H
 #define MAINFORM_H
 
-
 #include "moveableframelesswindow.h"
 
 #include <QWidget>
@@ -16,6 +15,7 @@ class MainForm : public MoveableFramelessWindow
 
 public:
     explicit MainForm(QWidget *parent = 0);
+    void setNick(QString nick);
     ~MainForm();
 
 private slots:
