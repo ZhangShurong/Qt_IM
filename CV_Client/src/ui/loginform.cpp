@@ -46,6 +46,8 @@ QWidget *LoginForm::getDragnWidget()
 
 void LoginForm::doLoginButClick()
 {
+    if(connected)
+        connectedSlot();
     tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
 }
 
@@ -56,7 +58,8 @@ void LoginForm::connManage()
 
 void LoginForm::errorSlot()
 {
-    QMessageBox::warning(this,tr("通知"),tr("连接服务器失败"),QMessageBox::Yes);
+    if(!connected)
+        QMessageBox::warning(this,tr("通知"),tr("连接服务器失败"),QMessageBox::Yes);
 }
 
 void LoginForm::connectedSlot()

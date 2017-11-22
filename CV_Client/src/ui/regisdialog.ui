@@ -38,7 +38,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="queEdit"/>
+      <widget class="QLineEdit" name="pwdEdit"/>
      </item>
     </layout>
    </item>
@@ -52,7 +52,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="ansEdit"/>
+      <widget class="QLineEdit" name="qusEdit"/>
      </item>
     </layout>
    </item>
@@ -66,7 +66,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="pwdEdit"/>
+      <widget class="QLineEdit" name="ansEdit"/>
      </item>
     </layout>
    </item>

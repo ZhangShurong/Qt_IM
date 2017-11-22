@@ -18,8 +18,13 @@ public:
 
 private:
     Ui::RegisDialog *ui;
+    QTcpSocket *tcpsocket;
+    bool connected;
 private slots:
     void doRegis();
+    void errorSlot();
+    void connectedSlot();
+    void readMessage();
 };
 
 #endif // REGISDIALOG_H

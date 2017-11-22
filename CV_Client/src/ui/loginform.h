@@ -61,7 +61,7 @@ public slots:
         IMClient *im = &IMClient::Instance(self);
         std::cout << im->getCurrID() << std::endl;
 
-        IMServerLocal iMServerLocal(PORT);
+        IMServerLocal iMServerLocal("0");
         iMServerLocal.start();
     }
 };

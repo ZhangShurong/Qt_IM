@@ -5,6 +5,7 @@
 #include <thread>
 #include "utils/jsoncpp/json.h"
 #include "IM/connection.h"
+#include <QDebug>
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
@@ -19,6 +20,7 @@ IMServerLocal::IMServerLocal(string port)
     initSock();
     linkSignalWithSlot();
     qRegisterMetaType<SOCKET>("SOCKET");
+    realPort = "0";
 }
 
 int IMServerLocal::start()
@@ -95,6 +97,13 @@ bool IMServerLocal::initSock()
     hints.ai_protocol = IPPROTO_TCP;
 
     int status = getaddrinfo(NULL, port.c_str(), &hints, &res);
+
+    //qDebug() << "Address is " << ((struct sockaddr_in *)&res)->sin_addr.s_addr;
+    u_short port_tmp = ((struct sockaddr_in *)&res)->sin_port ;
+    qDebug() << "Port is " << port_tmp;
+    realPort = QString::number(port_tmp);
+    //int status = getaddrinfo(NULL, NULL, &hints, &res);
+
     if (status != 0)
     {
         std::cout << "[ERROR]: " << status << " Unable to get address info for Port " << port << "." << std::endl;

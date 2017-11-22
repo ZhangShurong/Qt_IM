@@ -23,11 +23,17 @@ private:
     void linkSignalWithSlot();
     bool winsockStarted;
     void stop();
+    string realPort;
 signals:
     void newConn(SOCKET ClientSocket);
 public:
     IMServerLocal(string port);
     int start();
+    string getrealPort()
+    {
+        return realPort;
+    }
+
     ~IMServerLocal();
 };
 
