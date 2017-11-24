@@ -11,6 +11,7 @@
 #include "protocol/jspp.h"
 #include <list>
 #include <map>
+#include <QTcpSocket>
 #include "config.h"
 #include "user.h"
 #define LINE_BUF 2048
@@ -35,6 +36,8 @@ class IMClient : public QObject
 */  QMutex msg_mutex;
     list<JSPP> unread_msg_list;
     vector<JSPP> unsend_msg_vec;
+
+
 public:
     User *self;
     int sendMsg(string peer_id, string msg);
@@ -49,12 +52,6 @@ public:
     vector<JSPP> getUnreadMsg(string peer_id);
     int getIP_Port(string peer_id, IP_PORT &res);
 
-    //void newConnection(Connection *newConn);
-    //Conversation* getConversation(string peer_id);
-/*
-public slots:
-    void recvMsg(JSPP msg);
-*/
 private:
     IMClient() = delete;
     IMClient(User *user);                            // ctor hidden
@@ -62,12 +59,6 @@ private:
     IMClient& operator=(IMClient const&) = delete; // assign op. hidden
     ~IMClient();// dtor hidden
     SOCKET connectPeer(string peer_id);
-
-    // Conversation* createConversation(User *friend_user);
-/*
-public slots:
-    void mergeConn();
-    */
 };
 
 #endif // IMCLIENT_H

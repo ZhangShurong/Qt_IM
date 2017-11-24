@@ -63,7 +63,7 @@ void CV_Server::readMessage()
     if(msgJson.type == "login") {
         /*
          * 返回格式：好友列表+在线用户Ip与端口
-         * 注：暂时不启用好友功能,线上用户默认为好友
+         * 注：暂时不启用好友功能,注册用户默认为好友
          * vergil&CV*#*vergil=ip:port&dante=ip:port
          */
         bool ok = false;
@@ -78,6 +78,13 @@ void CV_Server::readMessage()
             resJson.code = "1";
         }
         else {
+            onlineUser[socket] = name.toStdString();
+            ui->textEdit->append(name + "上线了");
+            msg = QString::fromStdString(db->getAllUser())
+                    + "*#*"
+                    + QString::fromStdString(db->getallMap());
+            qDebug() << "Return friends info " << msg;
+            /*
             QString c = "";
             for(auto m = user_ip_map.begin();m!=user_ip_map.end();++m) {
                 msg += c + QString::fromStdString(m->first);
@@ -93,6 +100,7 @@ void CV_Server::readMessage()
                         + QString::fromStdString(m->second.port);
                 c = "&";
             }
+            */
         }
 
         resJson.body = msg.toStdString();
@@ -113,41 +121,45 @@ void CV_Server::readMessage()
         socket->write(tmp);
         socket->flush();
     }
-    else if(msgJson.type == "msg")
+    else if(msgJson.type == "chat")
     {
         //储存离线消息
+        db->insertMsg(msgJson);
+
+    }
+    else if(msgJson.type == "reqmsg") {
+        vector<JSPP> msgs= db->getMsg(msgJson.to);
+        for(JSPP item: msgs){
+            QByteArray tmp;
+            tmp.append(jspp_to_str(item).c_str());
+            socket->write(tmp);
+            socket->flush();
+        }
     }
     else if(msgJson.type == "port") {
         //保存用户名和端口
+        /*
+         * 消息格式:name&address:port
+         */
+        QStringList portInfo = QString::fromStdString(msgJson.body).split("&");
+        QString userName = portInfo[0];
+        QStringList add_port = portInfo[1].split(":");
+        JSPP res;
+        res.type = "port";
+        IP_PORT insertS;
+        insertS.address = add_port[0].toStdString();
+        insertS.port = add_port[1].toStdString();
+        if(0 != db->intsertMap(insertS, userName.toStdString())) {
+            res.code = "1";
+        }
+        QByteArray tmp;
+        tmp.append(jspp_to_str(res).c_str());
+        socket->write(tmp);
+        socket->flush();
     }
     else if(msgJson.type == "refresh") {
         //刷新用户状态
     }
-    /*
-    if(tmp[0] == '%'){
-
-        QString tmptmp(tmp);
-        ipname = tmptmp.split("%");
-
-        ips.append(ipname.at(1));
-        ips.append("^");
-        names.append(ipname.at(2));
-        names.append("^");
-
-        ipss = ips.split("^");
-        namess = names.split("^");
-
-        list();
-
-
-
-    }else{
-        for(int i = 0; i < userList.count(); i++)
-        {
-                 userList.at(i)->write(tmp);
-        }
-    }
-    */
 }
 
 QString CV_Server::getIP()  //获取ip地址
@@ -184,6 +196,13 @@ void CV_Server::removeUserFormList()
         ui->textEdit->append(tmp);
         list();
     }
+
+    if(onlineUser.find(socket) != onlineUser.end()) {
+        string name = onlineUser[socket];
+        ui->textEdit->append(QString::fromStdString(name) + "下线了");
+        db->deleteMap(name);
+    }
+
 }
 
 void CV_Server::on_pushButton_2_clicked()

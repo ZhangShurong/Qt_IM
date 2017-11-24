@@ -17,7 +17,7 @@ LoginForm::LoginForm(QWidget *parent) :
     connect(ui->pushButton_login,SIGNAL(clicked()),this,SLOT(doLoginButClick()));
     connect(ui->reglabel, SIGNAL(clicked()), this, SLOT(doRegisClick()));
 
-    ServerWorker *worker = new ServerWorker;
+    worker = new ServerWorker;
     serverThread = new QThread();
     worker->moveToThread(serverThread);
     connect(serverThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -84,19 +84,23 @@ void LoginForm::readMessage()
             User *self = new User(ui->lineEdit_un->text().toStdString());
             QString body = QString::fromStdString(res.body);
             QStringList bodyList = body.split("*#*");
+
             //生成朋友
             for(QString f : bodyList[0].split("&")) {
                 User *tmp = new User(f.toStdString());
                 self->addFriend(tmp);
             }
+
             //生成ip对应关系
             map<string, IP_PORT> ip_map;
             if(bodyList.size() == 2) {
-                for(QString m : bodyList[1].split("&")) {
-                    IP_PORT fIP;
-                    fIP.address = m.split("=")[1].split(":")[0].toStdString();
-                    fIP.port = m.split("=")[1].split(":")[1].toStdString();
-                    ip_map[m.split("=")[0].toStdString()] = fIP;
+                if(bodyList[1].size() != 0){
+                    for(QString m : bodyList[1].split("&")) {
+                        IP_PORT fIP;
+                        fIP.address = m.split("=")[1].split(":")[0].toStdString();
+                        fIP.port = m.split("=")[1].split(":")[1].toStdString();
+                        ip_map[m.split("=")[0].toStdString()] = fIP;
+                    }
                 }
             }
             loginOK(self, ip_map);
@@ -104,6 +108,13 @@ void LoginForm::readMessage()
              * {"body":"vergilzhang*#*CV=127.0.0.1:1024&vergilzhang=127.0.0.1:1314","code":"0","from":"","to":"","type":"login"}"
              */
         }
+    }
+    else if(res.type == "port") {
+        if(res.code == "1") {
+            QMessageBox::warning(this,tr("通知"),tr("同步端口信息失败"),QMessageBox::Yes);
+            return;
+        }
+        portOK();
     }
 }
 
@@ -126,15 +137,6 @@ void LoginForm::login(QString userInfo)
 
 void LoginForm::loginOK(User *self, map<string, IP_PORT> user_ip)
 {
-    //得到user和朋友状态
-//    User *self = new User("CV");
-//    User *vergil = new User("vergilzhang");
-
-//    self->addFriend(vergil);
-
-//    IP_PORT vergilIP;
-//    vergilIP.address = "127.0.0.1";
-//    vergilIP.port = "1314";
 
     emit readyForServer(self);
 
@@ -147,8 +149,36 @@ void LoginForm::loginOK(User *self, map<string, IP_PORT> user_ip)
     //connect(timer, SIGNAL(timeout()), this, SLOT(connManage()));
     timer->start(1000);
 
+    //显示主界面前，将本地端口通知服务器
+
+    string port_str = "";
+    int retry = 0;
+    while((port_str == "" || port_str == "0") && retry < 10 ) {
+        port_str = worker->getLocalPort();
+        Sleep(1000);
+        retry ++;
+    }
+    if(retry == 10 && port_str == "") {
+        QMessageBox::warning(this,tr("通知"),tr("获取本地端口失败"),QMessageBox::Yes);
+        tcpsocket->close();;
+        exit(1);
+    }
+
+    JSPP port_jspp;
+    port_jspp.type = "port";
+    port_jspp.body = (QString::fromStdString(self->getID())
+                      +"&" + "127.0.0.1:" + QString::fromStdString(port_str)).toStdString();
+
+    QByteArray tmp;
+    tmp.append(QString::fromStdString(jspp_to_str(port_jspp)));
+    tcpsocket->write(tmp);
+    tcpsocket->flush();
+}
+
+void LoginForm::portOK()
+{
     MainForm*m=new MainForm();
-    m->setNick(QString::fromStdString(self->getID()));
+    m->setNick(QString::fromStdString(IMClient::Instance().getCurrID()));
     m->show();
     this->hide();
 }

@@ -1,5 +1,6 @@
 #include "serverdb.h"
 #include <QDebug>
+#include "utils.h"
 
 ServerDB::ServerDB()
 {
@@ -119,6 +120,32 @@ int ServerDB::deleteUser(std::string id)
 
 }
 
+string ServerDB::getAllUser()
+{
+    //qDebug() << QString::fromStdString(to) <<"请求离线消息";
+    QSqlQuery sql_query(db);
+    string res = "";
+    QString select_sql = QString("select * from user");
+    sql_query.prepare(select_sql);
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+        return res;
+    }
+    else
+    {
+        QString c = "";
+        QString msg = "";
+        while(sql_query.next())
+        {
+            msg += c + sql_query.value(0).toString();
+            c = "&";
+        }
+        res = msg.toStdString();
+    }
+    return res;
+}
+
 int ServerDB::intsertMap(IP_PORT ip_port, std::string id)
 {
     QSqlQuery sql_query(db);
@@ -134,6 +161,112 @@ int ServerDB::intsertMap(IP_PORT ip_port, std::string id)
     }
 
     return 0;
+}
+
+int ServerDB::deleteMap(std::string id)
+{
+    QSqlQuery sql_query(db);
+    QString del_sql = "delete from ip_map where name = ?";
+    sql_query.prepare(del_sql);
+    sql_query.addBindValue(QString::fromStdString(id));
+
+    if(!sql_query.exec())
+    {
+        qDebug() << sql_query.lastError();
+        return -1;
+    }
+
+    return 0;
+}
+
+string ServerDB::getallMap()
+{
+    string res = "";
+    qDebug() <<"请求用户端口";
+    QSqlQuery sql_query(db);
+    QString select_sql = QString("select * from ip_map");
+    sql_query.prepare(select_sql);
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+        return res;
+    }
+    else
+    {
+        QString c = "";
+        QString msg;
+        while(sql_query.next())
+        {
+            msg +=c + sql_query.value(0).toString()
+                    + "="
+                    + sql_query.value(1).toString()
+                    + ":"
+                    + sql_query.value(2).toString();
+            c = "&";
+        }
+        res = msg.toStdString();
+    }
+    qDebug() << "IP PORT" <<QString::fromStdString(res);
+    return res;
+}
+
+int ServerDB::insertMsg(JSPP msg)
+{
+    QSqlQuery sql_query(db);
+    QString insert_sql = "insert into msg values (?, ?, ?, null)";
+    sql_query.prepare(insert_sql);
+    sql_query.addBindValue(QString::fromStdString(msg.from));
+    sql_query.addBindValue(QString::fromStdString(msg.to));
+    sql_query.addBindValue(QString::fromStdString(jspp_to_str(msg)));
+
+    if(!sql_query.exec())
+    {
+        qDebug() << sql_query.lastError();
+        return -1;
+    }
+
+    return 0;
+}
+
+int ServerDB::deleteMsg(std::string to)
+{
+    qDebug() << QString::fromStdString(to) <<"删除离线消息";
+    QSqlQuery sql_query(db);
+    vector<JSPP> res;
+    QString select_sql = QString("delete from msg where to_user = :to");
+    sql_query.prepare(select_sql);
+    sql_query.bindValue(":to",QString::fromStdString(to));
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+        return -1;
+    }
+    return 0;
+}
+
+vector<JSPP> ServerDB::getMsg(std::string to)
+{
+    qDebug() << QString::fromStdString(to) <<"请求离线消息";
+    QSqlQuery sql_query(db);
+    vector<JSPP> res;
+    QString select_sql = QString("select jspp from msg where to_user = :to order by id");
+    sql_query.prepare(select_sql);
+    sql_query.bindValue(":to",QString::fromStdString(to));
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+        return res;
+    }
+    else
+    {
+        while(sql_query.next())
+        {
+            res.push_back(parse(sql_query.value(0).toString().toStdString()));
+        }
+        deleteMsg(to);
+
+    }
+    return res;
 }
 
 

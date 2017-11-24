@@ -4,9 +4,10 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QObject>
+#include <vector>
 #include "user.h"
 #include "jspp.h"
-
+using std::vector;
 class ServerDB : public QObject
 {
     Q_OBJECT
@@ -19,13 +20,15 @@ public:
     int authUser(QString id, QString pwd);
     string getPwd(string id, string qus, string ans);
     int deleteUser(string id);
+    std::string getAllUser();
 
     int intsertMap(IP_PORT ip_port, string id);
-    IP_PORT getMap(string id);
+    int deleteMap(string id);
+    std::string getallMap();
 
     int insertMsg(JSPP msg);
-    int deleteMsg(string from, string to);
-    JSPP getMsg(string to);
+    int deleteMsg(string to);
+    vector<JSPP> getMsg(string to);
 
     ~ServerDB();
 };

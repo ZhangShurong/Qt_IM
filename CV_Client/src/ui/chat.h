@@ -12,6 +12,7 @@
 #include "IM/user.h"
 #include "protocol/jspp.h"
 #include <QUdpSocket>
+#include <QTcpSocket>
 #include "dialogrec.h"
 
 //#include "emotion.h"
@@ -29,6 +30,8 @@ class Chat : public QWidget
     string peer_port;
     DialogRec *dia;
 
+    QTcpSocket *tcpsocket;
+    bool connected;
 
 public:
     explicit Chat(QWidget *parent, User *peer_user);
@@ -43,16 +46,24 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     //最小化及关闭
     bool eventFilter(QObject *object, QEvent *e);
-    //void setConv(Conversation *conv_new);
+
+    //-------以下函数 仅用作离线消息
+    int  sendOffMsg(std::string peer_id, std::string msg);
+    void reqMsg();
+private slots:
+    void connectedSlot();
+    void disConnected();
+    void readMessage();
+    void errorSlot();
+    void initMsgSocket();
+    //-------以上函数 仅用作离线消息
 
 protected:
     void showEvent(QShowEvent *event);
 
 private slots:
-    //void processPendingDatagrams();
-    //void sendemotion(QString s);
-    void checkMsg();
 
+    void checkMsg();
     void on_sndBtn_clicked();
 
     void recvMsg(QString msg);
@@ -65,6 +76,7 @@ private:
     Ui::Chat *ui;
     QFileDialog *fDialog;
     void setIP_port();
+
     //Emotion* emotion;
 };
 

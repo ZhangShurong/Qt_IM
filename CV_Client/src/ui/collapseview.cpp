@@ -13,13 +13,6 @@ CollapseView::CollapseView(QWidget *parent) :
 
     ui->widget->layout()->addWidget(new CollapseViewItem("我的好友",this));
 
-    //ui->widget->layout()->addWidget(new CollapseViewItem("那些年",this));
-
-    //ui->widget->layout()->addWidget(new CollapseViewItem("陌生人",this));
-
-    //ui->scrollAreaWidgetContents->resize(this->width(),this->height());
-
-    //ui->scrollArea->resize(this->width(),this->height());
 
 }
 

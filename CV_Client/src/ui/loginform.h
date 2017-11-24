@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QTcpSocket>
 
+class ServerWorker;
 namespace Ui {
 class LoginForm;
 }
@@ -44,16 +45,19 @@ private:
     QThread *serverThread;
     QTimer *timer;
     QTcpSocket *tcpsocket;
-
+    ServerWorker *worker;
     bool connected;
     void login(QString userInfo);
 //    void loginOK();
     void loginOK(User *self, map<string, IP_PORT> user_ip);
+    void portOK();
 };
 
 class ServerWorker : public QObject
 {
     Q_OBJECT
+    string realport;
+    IMServerLocal *iMServerLocal;
 public slots:
     void runServer(User *self)
     {
@@ -61,8 +65,15 @@ public slots:
         IMClient *im = &IMClient::Instance(self);
         std::cout << im->getCurrID() << std::endl;
 
-        IMServerLocal iMServerLocal("0");
-        iMServerLocal.start();
+        iMServerLocal = new IMServerLocal("0");
+        iMServerLocal->start();
+        realport = iMServerLocal->getrealPort();
+    }
+public:
+    string getLocalPort(){
+        if(iMServerLocal)
+            realport = iMServerLocal->getrealPort();
+        return realport;
     }
 };
 

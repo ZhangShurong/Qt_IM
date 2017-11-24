@@ -9,6 +9,7 @@
 IMServerLocal::IMServerLocal(string port)
     :port(port),ListenSocket(INVALID_SOCKET),winsockStarted(false)
 {
+    realPort = "0";
     im = &IMClient::Instance();
     std::cout << im->getCurrID() << std::endl;
     WSADATA WSAData = {0};
@@ -20,7 +21,7 @@ IMServerLocal::IMServerLocal(string port)
     initSock();
     linkSignalWithSlot();
     qRegisterMetaType<SOCKET>("SOCKET");
-    realPort = "0";
+
 }
 
 int IMServerLocal::start()
@@ -41,6 +42,13 @@ int IMServerLocal::start()
 
     return 0;
 }
+
+std::string IMServerLocal::getrealPort()
+{
+    qDebug() << "get realport and realport is " << QString::fromStdString(realPort);
+    return realPort;
+}
+
 
 IMServerLocal::~IMServerLocal()
 {
@@ -98,10 +106,6 @@ bool IMServerLocal::initSock()
 
     int status = getaddrinfo(NULL, port.c_str(), &hints, &res);
 
-    //qDebug() << "Address is " << ((struct sockaddr_in *)&res)->sin_addr.s_addr;
-    u_short port_tmp = ((struct sockaddr_in *)&res)->sin_port ;
-    qDebug() << "Port is " << port_tmp;
-    realPort = QString::number(port_tmp);
     //int status = getaddrinfo(NULL, NULL, &hints, &res);
 
     if (status != 0)
@@ -125,6 +129,15 @@ bool IMServerLocal::initSock()
         closesocket(newsock);
         return false;
     }
+    struct sockaddr sockName = {0};
+    int len = sizeof(sockName);;
+    getsockname(newsock, &sockName, &len);
+
+    qDebug() << "Port is " << (((struct sockaddr_in*)(&sockName))->sin_port);
+    u_short port_tmp = ntohs(((struct sockaddr_in*)(&sockName))->sin_port);
+
+    realPort = QString::number(port_tmp).toStdString();
+    qDebug() << "realPort is " << QString::fromStdString(realPort);
 
     freeaddrinfo(res);
     int maxConnections = 100;

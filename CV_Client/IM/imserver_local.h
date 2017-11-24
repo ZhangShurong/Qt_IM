@@ -6,6 +6,7 @@
 #include <ws2tcpip.h>
 #include <string>
 #include <QThread>
+#include <QDebug>
 #include "protocol/jspp.h"
 #include "utils/utils.h"
 
@@ -29,10 +30,7 @@ signals:
 public:
     IMServerLocal(string port);
     int start();
-    string getrealPort()
-    {
-        return realPort;
-    }
+    string getrealPort();
 
     ~IMServerLocal();
 };

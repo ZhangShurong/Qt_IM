@@ -23,12 +23,14 @@ Chat::Chat(QWidget *parent, User *peer_user) :
     ui->textBrowser->verticalScrollBar()->setStyleSheet(file.readAll());
     ui->label_8->installEventFilter(this);
     move((QApplication::desktop()->width() - width())/2,(QApplication::desktop()->height() - height()-20)/2);
-    //conv = nullptr;
+
     this->peer_user = peer_user;
     timer  = new QTimer();
 
     dia = new DialogRec();
     setIP_port();
+
+    initMsgSocket();
 }
 
 Chat::~Chat()
@@ -173,7 +175,12 @@ void Chat::on_sndBtn_clicked()
         qDebug()<<s1;
         ui->textBrowser->insertHtml(s1);
     }
-    IMClient::Instance().sendMsg(peer_user->getID(), content.toStdString());
+    if(IMClient::Instance().sendMsg(peer_user->getID(), content.toStdString()) <= 0)
+    {
+        //发送失败
+        qDebug() << "消息发送失败！开始发送消息至服务器";
+        sendOffMsg(peer_user->getID(), content.toStdString());
+    }
     ui->textEdit->clear();
 }
 
@@ -230,7 +237,82 @@ void Chat::setIP_port()
         peer_port = res.port;
     }
     else {
+
         peer_ip = "";
         peer_port = "";
     }
+}
+
+void Chat::initMsgSocket()
+{
+    tcpsocket = new QTcpSocket();
+    connected = false;
+    connect(tcpsocket, SIGNAL(connected()), this, SLOT(connectedSlot()));
+    connect(tcpsocket,SIGNAL(readyRead()),this, SLOT(readMessage()));
+    connect(tcpsocket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(errorSlot()));
+    connect(tcpsocket,SIGNAL(disconnected()),this, SLOT(disConnected()));
+    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+}
+
+void Chat::connectedSlot()
+{
+    connected = true;
+    reqMsg();
+}
+int Chat::sendOffMsg(string peer_id, string msg)
+{
+    JSPP msg_json;
+    msg_json.body = msg;
+    msg_json.from = IMClient::Instance().getCurrID();
+    msg_json.to = peer_id;
+    msg_json.type = "chat";
+
+    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    if(!connected) {
+        qDebug() << "未连接离线消息服务器";
+        return -1;
+    }
+    QByteArray tmp;
+    tmp.append(jspp_to_str(msg_json).c_str());
+    int res = tcpsocket->write(tmp);
+    tcpsocket->flush();
+    return res;
+}
+void Chat::reqMsg()
+{
+    qDebug() << "开始请求离线消息";
+    if(!connected) {
+        qDebug() << "未连接离线消息服务器";
+        return;
+    }
+    JSPP msg;
+    msg.type = "reqmsg";
+    msg.to = IMClient::Instance().getCurrID();
+    QByteArray tmp;
+    tmp.append(jspp_to_str(msg).c_str());
+    tcpsocket->write(tmp);
+    tcpsocket->flush();
+}
+
+void Chat::readMessage()
+{
+    QString tmp;
+    tmp = tcpsocket->readAll();
+    JSPP res = parse(tmp.toStdString());
+    if(res.type == "chat") {
+        qDebug() << "收到离线消息";
+        recvMsg(QString::fromStdString(res.body));
+        //pushMsg(res);
+    }
+}
+void Chat::errorSlot()
+{
+    if(!connected) {
+        qDebug() << "连接离线消息服务器失败";
+    }
+}
+
+void Chat::disConnected()
+{
+    qDebug() << "与离线消息服务器断开了连接";
 }

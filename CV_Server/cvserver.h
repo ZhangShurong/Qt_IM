@@ -43,10 +43,12 @@ public:
     {
         User *CV = new User("CV");
         User *vergil = new User("vergilzhang");
+        User *dante = new User("dante");
         CV->addFriend(vergil);
         vergil->addFriend(CV);
         users.push_back(*CV);
         users.push_back(*vergil);
+        users.push_back(*dante);
         IP_PORT vergilIP;
         vergilIP.address = "127.0.0.1";
         vergilIP.port = "1314";
@@ -70,6 +72,8 @@ private slots:
 private:
     Ui::CVServer *ui;
     ServerDB *db;
+    map<QTcpSocket *,string> onlineUser;
+
     QString ip;
     QList <QTcpSocket *> userList;
     QList <QByteArray> userName;

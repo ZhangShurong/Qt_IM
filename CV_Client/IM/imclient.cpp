@@ -1,91 +1,15 @@
 #include "imclient.h"
 #include "user.h"
 #include <iostream>
+#include <QMessageBox>
 #include "connection.h"
 #include "conversation.h"
 #include "user.h"
-/*
-Conversation *IMClient::createConversation(User *friend_user)
-{
-    conn_list_mutex.lock();
-    Conversation *t = new Conversation(friend_user);
-    conv_vec.push_back(t);
-    conn_list_mutex.unlock();
-}
 
-Conversation *IMClient::getConversation(std::string peer_id)
-{
-    conn_list_mutex.lock();
-    std::map<string, size_t> index;
-    for(size_t i = 0;i < conv_vec.size();++i) {
-        index[conv_vec.at(i)->getPeerID()] = i;
-    }
-    std::map<string,size_t>::iterator it = index.find(peer_id);
-    if (it != index.end()){
-        conn_list_mutex.unlock();
-        return conv_vec.at(index[peer_id]);
-    }
-    else{
-        conn_list_mutex.unlock();
-        createConversation(new User(peer_id));
-        return conv_vec.back();
-    }
-    conn_list_mutex.unlock();
-}
-
-void IMClient::mergeConn()
-{
-    conn_list_mutex.lock();
-    qDebug() << "conn_list size is" << conn_list.size();
-
-    if(conn_list.size() == 0){
-        conn_list_mutex.unlock();
-        return;
-    }
-
-    std::map<string, size_t> index;
-    for(size_t i = 0;i < conv_vec.size();++i) {
-        index[conv_vec.at(i)->getPeerID()] = i;
-    }
-    for(list<Connection *>::iterator iter = conn_list.begin();
-        iter != conn_list.end();)
-    {
-        list<Connection *>::iterator iter_erase = iter ++;
-        string p_id = (*iter_erase)->getPeerid();
-        if(p_id == "")
-            continue;
-        std::map<string,size_t>::iterator it = index.find(p_id);
-        if (it != index.end()){
-            conv_vec.at(index[p_id])->setConn(*iter_erase);
-        }
-        else{
-            createConversation(new User(p_id));
-            conv_vec.back()->setConn(*iter_erase);
-        }
-        conn_list.erase(iter_erase);
-    }
-
-    qDebug() << " Now we have " <<conv_vec.size() << " Conversation";
-    conn_list_mutex.unlock();
-}
-
-void IMClient::newConnection(Connection *newConn)
-{
-    conn_list_mutex.lock();
-    conn_list.push_back(newConn);
-    qDebug() << "conn_list size is" << conn_list.size();
-    qDebug() << "conve size is" << conv_vec.size();
-    conn_list_mutex.unlock();
-}
-
-void IMClient::recvMsg(JSPP msg)
-{
-    std::cout << msg.body << std::endl;
-}
-
-*/
 SOCKET IMClient::connectPeer(std::string peer_id)
 {
+    if(frient_ip_map.find(peer_id) == frient_ip_map.end())
+        return INVALID_SOCKET;
     struct addrinfo *result = NULL,
             *ptr = NULL,
             hints;
@@ -188,7 +112,8 @@ int IMClient::sendMsg(string peer_id, string msg)
     msg_json.to = peer_id;
     msg_json.type = "chat";
 
-    return sendMsg(msg_json);
+    int res = sendMsg(msg_json);
+    return res;
 }
 
 int IMClient::sendMsg(JSPP msg)
