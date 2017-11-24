@@ -138,6 +138,7 @@ void CV_Server::readMessage()
         tmp.append(jspp_to_str(res).c_str());
         socket->write(tmp);
         socket->flush();
+        doRefresh();
     }
     else if(msgJson.type == "refresh") {
         //刷新用户状态
@@ -222,6 +223,7 @@ void CV_Server::doRefresh()
 {
 
     //刷新好友列表以及在线状态
+    qDebug() << "Do refresh";
     JSPP resJson;
     resJson.type = "refresh";
     QString msg;
