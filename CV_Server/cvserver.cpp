@@ -41,12 +41,11 @@ void CV_Server::newConnectSlot()
     QTcpSocket *tcp = tcpServer->nextPendingConnection();
     connect(tcp,SIGNAL(readyRead()),this,SLOT(readMessage()));
     userList << tcp;
-
+/*
     tmp.append(tcp->peerAddress().toString());
-    //tmp.append(tcp->peerPort());
     tmp.append("发起了连接");
     ui->textEdit->append(tmp);
-
+*/
     connect(tcp,SIGNAL(disconnected()),this,SLOT(removeUserFormList()));
 }
 
@@ -66,7 +65,6 @@ void CV_Server::readMessage()
          * 注：暂时不启用好友功能,注册用户默认为好友
          * vergil&CV*#*vergil=ip:port&dante=ip:port
          */
-        bool ok = false;
         QString name = QString::fromStdString(msgJson.body).split("*#*")[0];
         QString pwd = QString::fromStdString(msgJson.body).split("*#*")[1];
         //认证
@@ -80,6 +78,7 @@ void CV_Server::readMessage()
         else {
             onlineUser[socket] = name.toStdString();
             ui->textEdit->append(name + "上线了");
+            doRefresh();
             msg = QString::fromStdString(db->getAllUser())
                     + "*#*"
                     + QString::fromStdString(db->getallMap());
@@ -153,11 +152,11 @@ void CV_Server::readMessage()
             res_find.code = "1";
         }
         else {
-         string pwd_str = db->getPwd(info_list[0].toStdString(), info_list[1].toStdString(), info_list[2].toStdString());
-         if(pwd_str == "")
-            res_find.code = "1";
-         else
-             res_find.body = pwd_str;
+            string pwd_str = db->getPwd(info_list[0].toStdString(), info_list[1].toStdString(), info_list[2].toStdString());
+            if(pwd_str == "")
+                res_find.code = "1";
+            else
+                res_find.body = pwd_str;
         }
         QByteArray tmp;
         tmp.append(jspp_to_str(res_find).c_str());
@@ -171,12 +170,12 @@ QString CV_Server::getIP()  //获取ip地址
 {
     QList<QHostAddress> list = QNetworkInterface::allAddresses();
     foreach (QHostAddress address, list){
-       if(address.protocol() == QAbstractSocket::IPv4Protocol){
-           if (address.toString().contains("127.0.")){
-               continue;
-           }
-           return address.toString();
-       }
+        if(address.protocol() == QAbstractSocket::IPv4Protocol){
+            if (address.toString().contains("127.0.")){
+                continue;
+            }
+            return address.toString();
+        }
     }
     return 0;
 }
@@ -191,20 +190,24 @@ void CV_Server::removeUserFormList()
     QString tmp;
 
     QTcpSocket* socket = static_cast<QTcpSocket*>(sender());
-//    QTcpSocket *tcp = tcpServer->nextPendingConnection();
+    //    QTcpSocket *tcp = tcpServer->nextPendingConnection();
 
     socket->peerAddress().toString();
 
     if(userList.removeOne(socket)){
+        /*
         tmp.append(socket->peerAddress().toString());
         tmp.append("断开了连接！");
         ui->textEdit->append(tmp);
+        */
         list();
     }
 
     if(onlineUser.find(socket) != onlineUser.end()) {
         string name = onlineUser[socket];
         ui->textEdit->append(QString::fromStdString(name) + "下线了");
+        onlineUser.erase(onlineUser.find(socket));
+        doRefresh();
         db->deleteMap(name);
     }
 
@@ -215,19 +218,45 @@ void CV_Server::on_pushButton_2_clicked()
     ui->textEdit->clear();
 }
 
+void CV_Server::doRefresh()
+{
+
+    //刷新好友列表以及在线状态
+    JSPP resJson;
+    resJson.type = "refresh";
+    QString msg;
+
+    msg = QString::fromStdString(db->getAllUser())
+            + "*#*"
+            + QString::fromStdString(db->getallMap());
+    qDebug() << "Return friends info " << msg;
+
+
+    resJson.body = msg.toStdString();
+    QByteArray tmp;
+    tmp.append(jspp_to_str(resJson).c_str());
+
+    for(map<QTcpSocket *,string>::iterator iter = onlineUser.begin(); iter != onlineUser.end(); iter ++) {
+
+        QTcpSocket *socket = iter->first;
+        socket->write(tmp);
+        socket->flush();
+    }
+}
+
 void CV_Server::list()
 {
     QByteArray msg;
     QString aa;
     for(int i = 0; i < userList.count() && userList.at(i)->peerAddress().toString() != aa; i++){
         msg.append( userList.at(i)->peerAddress().toString());
-         for(int k = 0; k <ipss.count(); k++){
-             if( userList.at(i)->peerAddress().toString()== ipss.at(k)){
-                 msg.append("\n");
-                 msg.append(namess.at(k));
-                 break;
-             }
-         }
+        for(int k = 0; k <ipss.count(); k++){
+            if( userList.at(i)->peerAddress().toString()== ipss.at(k)){
+                msg.append("\n");
+                msg.append(namess.at(k));
+                break;
+            }
+        }
         msg.append("   @");
         aa =  userList.at(i)->peerAddress().toString();
     }

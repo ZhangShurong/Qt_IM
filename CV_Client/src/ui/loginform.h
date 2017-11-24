@@ -48,6 +48,7 @@ private:
     QTcpSocket *tcpsocket;
     ServerWorker *worker;
     bool connected;
+    bool logedin;
     void login(QString userInfo);
 //    void loginOK();
     void loginOK(User *self, map<string, IP_PORT> user_ip);

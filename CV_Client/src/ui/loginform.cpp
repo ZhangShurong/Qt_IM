@@ -13,7 +13,7 @@ LoginForm::LoginForm(QWidget *parent) :
     ui(new Ui::LoginForm)
 {
     ui->setupUi(this);
-
+    logedin = false;
     //关联登录按钮点击
     connect(ui->pushButton_login,SIGNAL(clicked()),this,SLOT(doLoginButClick()));
     connect(ui->reglabel, SIGNAL(clicked()), this, SLOT(doRegisClick()));
@@ -118,6 +118,31 @@ void LoginForm::readMessage()
         }
         portOK();
     }
+    else if (res.type == "refresh") {
+        if(!logedin)
+            return;
+        QString body = QString::fromStdString(res.body);
+        QStringList bodyList = body.split("*#*");
+        //生成朋友
+        for(QString f : bodyList[0].split("&")) {
+            User *tmp = new User(f.toStdString());
+            IMClient::Instance().self->addFriend(tmp);
+        }
+
+        //生成ip对应关系
+        map<string, IP_PORT> ip_map;
+        if(bodyList.size() == 2) {
+            if(bodyList[1].size() != 0){
+                for(QString m : bodyList[1].split("&")) {
+                    IP_PORT fIP;
+                    fIP.address = m.split("=")[1].split(":")[0].toStdString();
+                    fIP.port = m.split("=")[1].split(":")[1].toStdString();
+                    ip_map[m.split("=")[0].toStdString()] = fIP;
+                }
+            }
+        }
+        IMClient::Instance().frient_ip_map = ip_map;
+    }
 }
 
 void LoginForm::doRegisClick()
@@ -185,6 +210,7 @@ void LoginForm::loginOK(User *self, map<string, IP_PORT> user_ip)
 
 void LoginForm::portOK()
 {
+    logedin = true;
     MainForm*m=new MainForm();
     m->setNick(QString::fromStdString(IMClient::Instance().getCurrID()));
     m->show();

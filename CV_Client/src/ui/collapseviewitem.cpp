@@ -15,12 +15,10 @@ CollapseViewItem::CollapseViewItem(QString titleText, QWidget *parent) :
     ui->setupUi(this);
     ui->label->setProperty("slected",!ui->item_con->isVisible());
 
-    //todo 从服务器拉取好友
-    QString picPath=QString(":/media/person/media/person/10.jpg");
-    for(User *friendUser : IMClient::Instance().self->friends)
-    {
-        addSubItem(new LitterIem(picPath,friendUser,this));
-    }
+    timer = new QTimer();
+    refresh();
+    connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
+    timer->start(1000);
 
  /*
     //根据时间制作随机种子
@@ -52,6 +50,17 @@ CollapseViewItem::CollapseViewItem(QString titleText, QWidget *parent) :
 
     connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(onCollapseButClick()));
 
+}
+void CollapseViewItem::refresh()
+{
+    QString picPath=QString(":/media/person/media/person/10.jpg");
+    for(User *friendUser : IMClient::Instance().self->friends)
+    {
+        if(id_set.find(friendUser->getID()) == id_set.end()){
+            addSubItem(new LitterIem(picPath,friendUser,this));
+            id_set.insert(friendUser->getID());
+        }
+    }
 }
 
 CollapseViewItem::~CollapseViewItem()

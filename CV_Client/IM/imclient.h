@@ -37,7 +37,6 @@ class IMClient : public QObject
     list<JSPP> unread_msg_list;
     vector<JSPP> unsend_msg_vec;
 
-
 public:
     User *self;
     int sendMsg(string peer_id, string msg);
@@ -51,7 +50,6 @@ public:
     map<string, IP_PORT> frient_ip_map;
     vector<JSPP> getUnreadMsg(string peer_id);
     int getIP_Port(string peer_id, IP_PORT &res);
-
 private:
     IMClient() = delete;
     IMClient(User *user);                            // ctor hidden

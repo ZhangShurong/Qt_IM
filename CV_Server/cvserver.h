@@ -73,6 +73,7 @@ private:
     Ui::CVServer *ui;
     ServerDB *db;
     map<QTcpSocket *,string> onlineUser;
+    void doRefresh();
 
     QString ip;
     QList <QTcpSocket *> userList;

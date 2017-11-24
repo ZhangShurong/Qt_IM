@@ -4,6 +4,10 @@
 #include <QWidget>
 
 #include <QList>
+#include <set>
+#include <string>
+using std::set;
+using std::string;
 
 
 
@@ -39,6 +43,8 @@ public:
      */
     void addSubItem(QWidget*widget);
 
+public slots:
+    void refresh();
 private slots:
 
     /**
@@ -48,6 +54,8 @@ private slots:
 
 private:
     Ui::CollapseViewItem *ui;
+    QTimer *timer;
+    set<string> id_set;
 
 };
 
