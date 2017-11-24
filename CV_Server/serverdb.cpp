@@ -79,16 +79,12 @@ int ServerDB::authUser(QString id, QString pwd)
 std::string ServerDB::getPwd(std::string id, std::string qus, std::string ans)
 {
     QSqlQuery sql_query(db);
-    QString select_sql = QString("select * from user where name = ")
-            + "\'"
-            + QString::fromStdString(id)
-            + "\'"
-            + " and qus = \'"
-            + QString::fromStdString(qus)
-            + "\' and ans = \'"
-            + QString::fromStdString(ans)
-            + "\'";
-    if(!sql_query.exec(select_sql))
+    QString select_sql = QString("select pwd from user where name = ? and qus = ? and ans = ?");
+    sql_query.prepare(select_sql);
+    sql_query.addBindValue(QString::fromStdString(id));
+    sql_query.addBindValue(QString::fromStdString(qus));
+    sql_query.addBindValue(QString::fromStdString(ans));
+    if(!sql_query.exec())
     {
         qDebug()<<sql_query.lastError();
         return "";
@@ -97,7 +93,7 @@ std::string ServerDB::getPwd(std::string id, std::string qus, std::string ans)
     {
         if(sql_query.next())
         {
-            QString PWD = sql_query.value(1).toString();
+            QString PWD = sql_query.value(0).toString();
             return PWD.toStdString();
         }
 
@@ -275,3 +271,4 @@ ServerDB::~ServerDB()
 {
 
 }
+

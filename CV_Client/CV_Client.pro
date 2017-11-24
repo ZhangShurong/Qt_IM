@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     utils/utils.cpp \
     src/ui/dialogrec.cpp \
     src/ui/regisdialog.cpp \
-    src/ui/clickablelabel.cpp
+    src/ui/clickablelabel.cpp \
+    src/ui/forgotdia.cpp
 
 HEADERS  += \
     src/ui/loginform.h \
@@ -55,7 +56,8 @@ HEADERS  += \
     config.h \
     src/ui/dialogrec.h \
     src/ui/regisdialog.h \
-    src/ui/clickablelabel.h
+    src/ui/clickablelabel.h \
+    src/ui/forgotdia.h
 
 FORMS    += \
     src/ui/loginform.ui \
@@ -67,7 +69,8 @@ FORMS    += \
     src/ui/chat.ui \
     src/ui/slidewindow.ui \
     src/ui/dialogrec.ui \
-    src/ui/regisdialog.ui
+    src/ui/regisdialog.ui \
+    src/ui/forgotdia.ui
 
 RESOURCES += \
     rs/rs.qrc

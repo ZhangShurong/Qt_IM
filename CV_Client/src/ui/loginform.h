@@ -37,6 +37,7 @@ private slots:
     void connectedSlot();
     void readMessage();
     void doRegisClick();
+    void doForgetPwd();
 
 signals:
     void readyForServer(User *self);

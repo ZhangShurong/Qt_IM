@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include "regisdialog.h"
+#include "forgotdia.h"
 
 LoginForm::LoginForm(QWidget *parent) :
     MoveableFramelessWindow(parent),
@@ -16,6 +17,7 @@ LoginForm::LoginForm(QWidget *parent) :
     //关联登录按钮点击
     connect(ui->pushButton_login,SIGNAL(clicked()),this,SLOT(doLoginButClick()));
     connect(ui->reglabel, SIGNAL(clicked()), this, SLOT(doRegisClick()));
+    connect(ui->forgetLabel, SIGNAL(clicked()), this, SLOT(doForgetPwd()));
 
     worker = new ServerWorker;
     serverThread = new QThread();
@@ -122,6 +124,12 @@ void LoginForm::doRegisClick()
 {
     RegisDialog *r_dia = new RegisDialog();
     r_dia->show();
+}
+
+void LoginForm::doForgetPwd()
+{
+    ForgotDia *dia = new ForgotDia();
+    dia->show();
 }
 
 void LoginForm::login(QString userInfo)

@@ -84,23 +84,6 @@ void CV_Server::readMessage()
                     + "*#*"
                     + QString::fromStdString(db->getallMap());
             qDebug() << "Return friends info " << msg;
-            /*
-            QString c = "";
-            for(auto m = user_ip_map.begin();m!=user_ip_map.end();++m) {
-                msg += c + QString::fromStdString(m->first);
-                c = "&";
-            }
-            c = "";
-            msg += "*#*";
-            for(auto m = user_ip_map.begin();m!=user_ip_map.end();++m) {
-                msg += c + QString::fromStdString(m->first)
-                        + QString("=")
-                        + QString::fromStdString(m->second.address)
-                        + QString(":")
-                        + QString::fromStdString(m->second.port);
-                c = "&";
-            }
-            */
         }
 
         resJson.body = msg.toStdString();
@@ -159,6 +142,28 @@ void CV_Server::readMessage()
     }
     else if(msgJson.type == "refresh") {
         //刷新用户状态
+    }
+    else if (msgJson.type == "findpwd") {
+        //找回密码
+        qDebug() << "findpwd";
+        JSPP res_find;
+        res_find.type = "findpwd";
+        QStringList info_list = QString::fromStdString(msgJson.body).split("&");
+        if(info_list.size() != 3){
+            res_find.code = "1";
+        }
+        else {
+         string pwd_str = db->getPwd(info_list[0].toStdString(), info_list[1].toStdString(), info_list[2].toStdString());
+         if(pwd_str == "")
+            res_find.code = "1";
+         else
+             res_find.body = pwd_str;
+        }
+        QByteArray tmp;
+        tmp.append(jspp_to_str(res_find).c_str());
+        qDebug() << jspp_to_str(res_find).c_str();
+        socket->write(tmp);
+        socket->flush();
     }
 }
 

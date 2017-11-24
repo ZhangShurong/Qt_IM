@@ -30,6 +30,7 @@ public:
     int deleteMsg(string to);
     vector<JSPP> getMsg(string to);
 
+
     ~ServerDB();
 };
 
