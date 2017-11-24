@@ -8,18 +8,38 @@
 #include <QFile>
 #include "IM/imclient.h"
 #include <QMessageBox>
+#include <QTcpServer>
+
+#define TCP
+#define BUF_SIZE 4096
 
 namespace Ui {
-    class DialogRec;
+class DialogRec;
 }
 
 class DialogRec : public QDialog
 {
     Q_OBJECT
 
-    string fileName;
+   // string fileName;
     string peer_user;
-    QUdpSocket *udpsocket;
+    string port;
+#ifndef TCP
+    QUdpSocket *udpsocket;//UDP文件传输,不可靠
+#else
+    QTcpServer * tcpServer; //监听
+    QTcpSocket * tcpSocket; //通信
+    QFile file;             //文件对象
+    QString fileName;       //文件名字
+    qint64 fileSize;        //文件大小
+    qint64 sendSize;        //已经发送大小
+    QTimer timer;           //定时器
+    void sendHeader();
+private slots:
+    void sendData();
+    //QTcpSocket *tcpSocket;//TCP文件传输
+#endif
+
 public:
     explicit DialogRec(QWidget *parent = 0);
     void setFileReq(JSPP fileReq);
