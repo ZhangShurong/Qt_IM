@@ -1,3 +1,6 @@
+/*
+ * 消息发送，文件传输发送
+ */
 #ifndef CHAT_H
 #define CHAT_H
 
@@ -8,14 +11,14 @@
 #include <QScrollBar>
 #include <QFile>
 #include <QFileDialog>
-//#include "IM/conversation.h"
 #include "IM/user.h"
 #include "protocol/jspp.h"
 #include <QUdpSocket>
 #include <QTcpSocket>
 #include "dialogrec.h"
 
-//#include "emotion.h"
+#define TCP
+
 namespace Ui {
 class Chat;
 }
@@ -70,14 +73,25 @@ private slots:
     void recvMsg(vector<JSPP> msg_vec);
 
     void on_sndFileBtn_clicked();
-    void sendFile(QString fileName, QString fileport);
+    void sendFile(QString filePath, QString fileport);
 
 private:
     Ui::Chat *ui;
     QFileDialog *fDialog;
     void setIP_port();
-
-    //Emotion* emotion;
+#ifdef TCP
+    QTcpServer * tcpServer; //监听
+    QTcpSocket * fileSocket; //通信
+    QFile file;             //文件对象
+    QString fileName;       //文件名字
+    qint64 fileSize;        //文件大小
+    qint64 sendSize;        //已经发送大小
+    //QTimer filetimer;           //定时器
+    void sendHeader();
+    void initFileSocket();
+#endif
+    string initFileServer();
+    void sendData();
 };
 
 #endif // CHAT_H

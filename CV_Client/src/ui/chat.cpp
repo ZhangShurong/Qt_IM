@@ -18,9 +18,9 @@ Chat::Chat(QWidget *parent, User *peer_user) :
     ui->label_4->installEventFilter(this);
     ui->label_5->installEventFilter(this);
     ui->nameLabel->setText(QString::fromStdString(peer_user->getID()));
-    QFile file(":/myqss/scrollbar.qss");
-    file.open(QFile::ReadOnly);
-    ui->textBrowser->verticalScrollBar()->setStyleSheet(file.readAll());
+    QFile cssfile(":/myqss/scrollbar.qss");
+    cssfile.open(QFile::ReadOnly);
+    ui->textBrowser->verticalScrollBar()->setStyleSheet(cssfile.readAll());
     ui->label_8->installEventFilter(this);
     move((QApplication::desktop()->width() - width())/2,(QApplication::desktop()->height() - height()-20)/2);
 
@@ -31,6 +31,7 @@ Chat::Chat(QWidget *parent, User *peer_user) :
     setIP_port();
 
     initMsgSocket();
+    initFileSocket();
 }
 
 Chat::~Chat()
@@ -191,22 +192,78 @@ void Chat::on_sndFileBtn_clicked()
     if(fileName.isEmpty()){
         return;
     }
-
+    string port = initFileServer();
     JSPP msg;
     msg.type = "file";
-    msg.body = fileName.toStdString();
+    msg.body = (fileName + "&" + QString::fromStdString(port)).toStdString();
     msg.from = IMClient::Instance().getCurrID();
     msg.to = peer_user->getID();
     IMClient::Instance().sendMsg(msg);
+
+}
+string Chat::initFileServer()
+{
+    string port = "";
+    //创建对象指定父对象
+    tcpServer = new QTcpServer(this);
+    //绑定监听
+    tcpServer->listen(QHostAddress::Any);
+    port = QString::number(tcpServer->serverPort()).toStdString();
+    //如果客户端和服务器成功连接
+    //tcpServer会自动触发newConnection()信号
+    connect(tcpServer,&QTcpServer::newConnection,
+            [=](){
+        //获取通信套接字
+        fileSocket = tcpServer->nextPendingConnection();
+        connect(fileSocket, QTcpSocket::readyRead,
+                [=](){
+            QByteArray buf = fileSocket->readAll();
+            //采用回射信息进行粘包处理
+            if("FileHead recv" == QString(buf)){
+                //ui->textEdit->append("文件头部接收成功，开始发送文件...");
+                sendData();
+            }
+            else if("file write done" == QString(buf)){
+                //服务器发送的快，而客户端接收的慢，所以要等客户端接收完毕后才能断开连接，以免丢包
+                QMessageBox::information(this,"完成","对端接收完成");
+                //ui->textEdit->append("文件发送且接收完成");
+                file.close();
+                fileSocket->disconnectFromHost();
+                fileSocket->close();
+            }
+        }
+        );
+    }
+    );
+    return port;
 }
 
-void Chat::sendFile(QString fileName, QString fileport)
+void Chat::sendFile(QString filePath, QString fileport)
 {
+#ifdef TCP
+    if(false == filePath.isEmpty()){    //路径有效
+        fileName.clear();
+        fileSize = 0;
+        //获取文件信息：名字、大小
+        QFileInfo info(filePath);
+        fileName = info.fileName();
+        fileSize = info.size();
+        sendSize = 0;   //已经发送文件大小
+
+        //以只读方式打开文件
+        file.setFileName(filePath);
+        file.setFileName(filePath);
+        if(false == file.open(QIODevice::ReadOnly)){
+             qDebug() << "只读方式打开文件失败";
+        }
+    }
+    sendHeader();
+#else
     QUdpSocket PicSocket;
     QHostAddress localaddr1;
     ssize_t i = 0;
     if(peer_ip == "")
-            return;
+        return;
     localaddr1.setAddress(QString::fromStdString(peer_ip));
 
     int port;
@@ -226,6 +283,7 @@ void Chat::sendFile(QString fileName, QString fileport)
     PicSocket.writeDatagram(str.data(),str.size(),localaddr1,port);
     qDebug() << "size is" << i << "-----";
     QMessageBox::warning(this,tr("通知"),tr("发送完成"),QMessageBox::Yes);
+#endif
 }
 
 void Chat::setIP_port()
@@ -315,4 +373,37 @@ void Chat::errorSlot()
 void Chat::disConnected()
 {
     qDebug() << "与离线消息服务器断开了连接";
+}
+
+void Chat::sendHeader()
+{
+    //先发送文件头信息:文件名##大小
+    //构造头部信息
+    QString head = QString("%1##%2").arg(fileName).arg(fileSize);
+    //发送头部信息
+    qint64 len = fileSocket->write(head.toUtf8());
+
+    if(len < 0){
+        //关闭文件
+        file.close();
+    }
+}
+
+void Chat::initFileSocket()
+{
+    fileSocket = new QTcpSocket();
+}
+
+void Chat::sendData()
+{
+    qint64 len = 0;
+    do{
+        //一次发送的大小
+        char buf[BUF_SIZE] = {0};
+        len = 0;
+        len = file.read(buf,BUF_SIZE);  //len为读取的字节数
+        len = fileSocket->write(buf,len);    //len为发送的字节数
+        //已发数据累加
+        sendSize += len;
+    }while(len > 0);
 }

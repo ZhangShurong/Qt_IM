@@ -2,34 +2,6 @@
 #include "ui_dialogrec.h"
 
 
-void DialogRec::sendHeader()
-{
-    //先发送文件头信息:文件名##大小
-    //构造头部信息
-    QString head = QString("%1##%2").arg(fileName).arg(fileSize);
-    //发送头部信息
-    qint64 len = tcpSocket->write(head.toUtf8());
-
-    if(len < 0){
-        //关闭文件
-        file.close();
-    }
-}
-
-void DialogRec::sendData()
-{
-    qint64 len = 0;
-        do{
-            //一次发送的大小
-            char buf[BUF_SIZE] = {0};
-            len = 0;
-            len = file.read(buf,BUF_SIZE);  //len为读取的字节数
-            len = tcpSocket->write(buf,len);    //len为发送的字节数
-            //已发数据累加
-            sendSize += len;
-        }while(len > 0);
-}
-
 DialogRec::DialogRec(QWidget *parent):
     QDialog(parent),
     ui(new Ui::DialogRec)
@@ -37,21 +9,57 @@ DialogRec::DialogRec(QWidget *parent):
     ui->setupUi(this);
     this->setWindowTitle(tr("文件传输！"));
     port = "0";
+
 #ifndef TCP
     udpsocket = new QUdpSocket();
 #else
     tcpSocket = new QTcpSocket();
+    connect(tcpSocket,&QTcpSocket::readyRead,
+            [=](){
+        QByteArray buf = tcpSocket->readAll();
+        if(true == isStart){
+            isStart = false;
+            //接收包头
+            fileName = QString(buf).section("##",0,0);
+            fileSize = QString(buf).section("##",1,1).toInt();
+            recvSize = 0;
+
+            QString str = QString("接收的文件:[%1:%2kB]").arg(fileName).arg(fileSize/1024);
+            setWindowTitle(str);
+
+            file.setFileName(fileName);
+            if(false == file.open(QIODevice::WriteOnly)){
+                QMessageBox::information(this,"Error","文件创建并打开失败!");
+            }
+            tcpSocket->write("FileHead recv");
+        }else{
+            //接收处理文件
+            qint64 len = file.write(buf);
+            recvSize += len;
+            if(recvSize == fileSize){//接收完毕
+                file.close();
+                //提示信息
+                QMessageBox::information(this,"完成","文件接收完成");
+                //回射信息
+                tcpSocket->write("file write done");
+                tcpSocket->disconnectFromHost();
+                tcpSocket->close();
+            }
+        }
+    }
+    );
 #endif
 }
 
 void DialogRec::setFileReq(JSPP fileReq)
 {
-    fileName = QString::fromStdString(fileReq.body);
+    fileName = QString::fromStdString(fileReq.body).split("&")[0];;
     peer_user = fileReq.from;
     ui->label->setText(QString::fromStdString(peer_user) +
                        "向您发送文件" +
                        fileName.split("/").back() +
                        "是否接收？");
+    port = QString::fromStdString(fileReq.body).split("&")[1].toStdString();
 }
 
 
@@ -69,37 +77,7 @@ void DialogRec::on_okBtn_clicked()
     connect(udpsocket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
     port = "10086";
 #else
-    //创建对象指定父对象
-    tcpServer = new QTcpServer(this);
-    //绑定监听
-    tcpServer->listen(QHostAddress::Any);
-    port = QString::number(tcpServer->serverPort()).toStdString();
-    //如果客户端和服务器成功连接
-    //tcpServer会自动触发newConnection()信号
-    connect(tcpServer,&QTcpServer::newConnection,
-            [=](){
-        //获取通信套接字
-        tcpSocket = tcpServer->nextPendingConnection();
-        connect(tcpSocket, QTcpSocket::readyRead,
-                [=](){
-            QByteArray buf = tcpSocket->readAll();
-            //采用回射信息进行粘包处理
-            if("FileHead recv" == QString(buf)){
-                //ui->textEdit->append("文件头部接收成功，开始发送文件...");
-                sendData();
-            }
-            else if("file write done" == QString(buf)){
-                //服务器发送的快，而客户端接收的慢，所以要等客户端接收完毕后才能断开连接，以免丢包
-                QMessageBox::information(this,"完成","对端接收完成");
-                //ui->textEdit->append("文件发送且接收完成");
-                file.close();
-                tcpSocket->disconnectFromHost();
-                tcpSocket->close();
-            }
-        }
-        );
-    }
-    );
+    tcpSocket->connectToHost(QString("127.0.0.1"),QString::fromStdString(port).toInt());
 #endif
     //todo 动态获取端口
     QString body = fileName + QString::fromStdString("*#*") + QString::fromStdString(port);
@@ -110,6 +88,7 @@ void DialogRec::on_okBtn_clicked()
     msg.to = peer_user;
     msg.code = "1";
     IMClient::Instance().sendMsg(msg);
+    isStart = true;
 }
 
 void DialogRec::on_noBtn_clicked()
