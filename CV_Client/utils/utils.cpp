@@ -40,3 +40,27 @@ string jspp_to_str(const JSPP msg_json)
     QString strJson(byteArray);
     return strJson.toStdString();
 }
+
+
+AES_utils::AES_utils()
+{
+    unsigned char iv[] = {103,35,148,239,76,213,47,118,255,222,123,176,106,134,98,92};
+    unsigned char key[] = {143,194,34,208,145,203,230,143,177,246,97,206,145,92,255,84};
+    moo.set_key(key);
+    moo.set_mode(MODE_OFB);
+    moo.set_iv(iv);
+}
+
+int AES_utils::encrypt(char *in, size_t src_len, char *out)
+{
+    char *temp = new char[src_len];
+    memcpy(temp, in, src_len);
+    int len = moo.Encrypt((unsigned char *)temp, src_len, (unsigned char *)out);
+    return len;
+}
+
+int AES_utils::decrypt(char *in, size_t src_len, char *out)
+{
+    int len = moo.Decrypt((unsigned char *)in, src_len, (unsigned char *)out);
+    return len;
+}

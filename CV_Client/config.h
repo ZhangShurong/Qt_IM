@@ -1,6 +1,7 @@
 #ifndef CONFIG
 #define CONFIG
 #include <string>
+#define ENCRYPT
 using std::string;
 const string ADDRESS = "127.0.0.1";
 const string PORT = "1024";

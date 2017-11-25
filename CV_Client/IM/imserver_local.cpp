@@ -66,7 +66,11 @@ void Distributor::msg_distribution(SOCKET ClientSocket)
     char recvbuf[LINE_BUF] = {0};
     int recvbuflen = LINE_BUF;
     do {
+#ifdef ENCRYPT
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+#else
+        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+#endif
         if (iResult > 0) {
             JSPP msg = parse(string(recvbuf));
             printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());

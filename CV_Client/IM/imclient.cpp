@@ -129,7 +129,16 @@ int IMClient::sendMsg(JSPP msg)
 
     const char *sendbuf = send_str.c_str();
     // Send an initial buffer
+#ifdef ENCRYPT
+    char *send_tmp = new char[sizeof(sendbuf)];
+    char *tmp = new char[sizeof(sendbuf)];
+    memcpy(send_tmp,sendbuf,sizeof(sendbuf));
+    AES_utils::Instance().encrypt(send_tmp, sizeof(sendbuf), tmp);
+    qDebug() << tmp;
+    int iResult = send( self_sock, tmp, (int)strlen(sendbuf), 0 );
+#else
     int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
+#endif
     if (iResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
         closesocket(self_sock);
@@ -138,6 +147,10 @@ int IMClient::sendMsg(JSPP msg)
     }
     printf("Bytes Sent: %ld\n", iResult);
     closesocket(self_sock);
+#ifdef ENCRYPT
+    delete []send_tmp;
+    delete []tmp;
+#endif
     return iResult;
 }
 
