@@ -68,15 +68,23 @@ int AES_utils::decrypt(unsigned char *in, size_t src_len, unsigned char *out)
     return len;
 }
 //加密
-void encode(char *pstr){
-    int len = strlen(pstr);//获取长度
+void encode(char *pstr, int len_a){
+    int len;
+    if(len_a == -1)
+        len = strlen(pstr);//获取长度
+    else
+        len = len_a;
     for (int i = 0; i < len; i++)
         *(pstr + i) = *(pstr + i) ^ i;
 }
 
 //解密
-void decode(char *pstr){
-    int len = strlen(pstr);
+void decode(char *pstr,int len_a){
+    int len;
+    if(len_a == -1)
+        len = strlen(pstr);//获取长度
+    else
+        len = len_a;
     for (int i = 0; i < len; i++)
         *(pstr + i) = *(pstr + i) ^ i;
 }

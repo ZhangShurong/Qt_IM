@@ -15,6 +15,10 @@ DialogRec::DialogRec(QWidget *parent):
     udpsocket = new QUdpSocket();
 #else
     tcpSocket = new QTcpSocket();
+    connect(tcpSocket,&QTcpSocket::disconnected,[=](){
+        tcpSocket->disconnectFromHost();
+        tcpSocket->close();
+    });
     connect(tcpSocket,&QTcpSocket::readyRead,
             [=](){
         QByteArray buf = tcpSocket->readAll();
@@ -27,27 +31,26 @@ DialogRec::DialogRec(QWidget *parent):
 
             QString str = QString("接收的文件:[%1:%2kB]").arg(fileName).arg(fileSize/1024);
             setWindowTitle(str);
+            qDebug() << str;
 
             file.setFileName(fileName);
             if(false == file.open(QIODevice::WriteOnly)){
                 QMessageBox::information(this,"Error","文件创建并打开失败!");
             }
             tcpSocket->write("FileHead recv");
+            tcpSocket->flush();
         }else{
             //接收处理文件
-            char *tmp = new char[buf.size()];
-            decode(tmp);
-            qint64 len = file.write(tmp);
-            delete []tmp;
+            qint64 len = file.write(buf);
             recvSize += len;
-            if(recvSize == fileSize){//接收完毕
+            qDebug() << "%" << recvSize/fileSize;
+            if(recvSize >= fileSize){//接收完毕
                 file.close();
                 //提示信息
                 QMessageBox::information(this,"完成","文件接收完成");
                 //回射信息
                 tcpSocket->write("file write done");
-                tcpSocket->disconnectFromHost();
-                tcpSocket->close();
+                tcpSocket->flush();
             }
         }
     }
@@ -112,23 +115,7 @@ void DialogRec::readPendingDatagrams()
     QFile file(fileName.split("/").back());
     if(!file.open(QIODevice::ReadWrite)) return;
     file.resize(0);//清空原有内容
-#ifndef TCP
-    while(udpsocket->hasPendingDatagrams()){
-        QByteArray datagram;
-        datagram.resize(udpsocket->pendingDatagramSize());
-        QHostAddress sender;
-        quint16 Pic_port;
-        udpsocket->readDatagram(datagram.data(),datagram.size(),&sender,&Pic_port);
-        if(datagram!="End!") {
-            file.write(datagram.data(),datagram.size());
-            qDebug()<<datagram.size()<<endl;
-        }else{
-            break;
-        }
-    }
-#else
 
-#endif
     file.close();
     //udpsocket->close();
     QMessageBox::warning(this,tr("通知"),tr("接收完成"),QMessageBox::Yes);

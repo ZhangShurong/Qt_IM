@@ -220,7 +220,7 @@ string Chat::initFileServer()
             QByteArray buf = fileSocket->readAll();
             //采用回射信息进行粘包处理
             if("FileHead recv" == QString(buf)){
-                //ui->textEdit->append("文件头部接收成功，开始发送文件...");
+                qDebug() << "文件头部接收成功，开始发送文件...";
                 sendData();
             }
             else if("file write done" == QString(buf)){
@@ -259,30 +259,6 @@ void Chat::sendFile(QString filePath, QString fileport)
     }
     sendHeader();
 #else
-    QUdpSocket PicSocket;
-    QHostAddress localaddr1;
-    ssize_t i = 0;
-    if(peer_ip == "")
-        return;
-    localaddr1.setAddress(QString::fromStdString(peer_ip));
-
-    int port;
-    strstream ss;
-    ss << fileport.toStdString();
-    ss >> port;
-
-    QFile file;
-    file.setFileName(fileName);
-    if(!file.open(QIODevice::ReadOnly)) return;
-    while(!file.atEnd()){
-        QByteArray line=file.read(8000);
-        PicSocket.writeDatagram(line,localaddr1,port);
-        i+=line.size();
-    }
-    QByteArray str = "End!";
-    PicSocket.writeDatagram(str.data(),str.size(),localaddr1,port);
-    qDebug() << "size is" << i << "-----";
-    QMessageBox::warning(this,tr("通知"),tr("发送完成"),QMessageBox::Yes);
 #endif
 }
 
@@ -382,6 +358,7 @@ void Chat::sendHeader()
     QString head = QString("%1##%2").arg(fileName).arg(fileSize);
     //发送头部信息
     qint64 len = fileSocket->write(head.toUtf8());
+    fileSocket->flush();
 
     if(len < 0){
         //关闭文件
@@ -396,15 +373,21 @@ void Chat::initFileSocket()
 
 void Chat::sendData()
 {
+    printf("Sending");
     qint64 len = 0;
     do{
+        printf(".");
         //一次发送的大小
         char buf[BUF_SIZE] = {0};
-        encode(buf);
         len = 0;
         len = file.read(buf,BUF_SIZE);  //len为读取的字节数
-        len = fileSocket->write(buf,len);    //len为发送的字节数
+        if(-1 == fileSocket->write(buf,len)){
+            qDebug() << "Error";//len为发送的字节数
+            return;
+        }
+        fileSocket->flush();
         //已发数据累加
         sendSize += len;
     }while(len > 0);
+    printf("\nSend Over");
 }

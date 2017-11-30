@@ -130,9 +130,10 @@ int IMClient::sendMsg(JSPP msg)
     const char *sendbuf = send_str.c_str();
     // Send an initial buffer
 #ifdef ENCRYPT
-    char *realSnd = new char[send_str.size()];
+    char *realSnd = new char[send_str.size() + 1];
+    realSnd[send_str.size()] = 0;
     memcpy(realSnd, sendbuf, send_str.size());
-    encode(realSnd);
+    encode(realSnd,send_str.size());
     printf("send is %s", realSnd);
     int iResult = send( self_sock, realSnd, send_str.size(), 0 );
 #else

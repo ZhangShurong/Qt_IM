@@ -70,8 +70,9 @@ void Distributor::msg_distribution(SOCKET ClientSocket)
         char recvbuf_tmp[LINE_BUF] = {0};
         iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
         printf("recv is %s\n", recvbuf_tmp);
-        decode(recvbuf_tmp);
-        memcpy(recvbuf, recvbuf_tmp,LINE_BUF);
+        memcpy(recvbuf, recvbuf_tmp,iResult);
+        decode(recvbuf, iResult);
+
 #else
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 #endif

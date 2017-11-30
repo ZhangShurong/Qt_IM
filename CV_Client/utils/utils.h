@@ -9,10 +9,10 @@ using std::string;
 JSPP parse(string json_str);
 string jspp_to_str(const JSPP msg_json);
 //加密
-void encode(char *pstr);
+void encode(char *pstr,int len_a = -1);
 
 //解密
-void decode(char *pstr);
+void decode(char *pstr,int len_a = -1);
 
 class AES_utils{
     AES_utils();
