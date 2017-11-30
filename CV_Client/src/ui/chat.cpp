@@ -400,6 +400,7 @@ void Chat::sendData()
     do{
         //一次发送的大小
         char buf[BUF_SIZE] = {0};
+        encode(buf);
         len = 0;
         len = file.read(buf,BUF_SIZE);  //len为读取的字节数
         len = fileSocket->write(buf,len);    //len为发送的字节数

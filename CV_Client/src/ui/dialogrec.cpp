@@ -1,5 +1,6 @@
 #include "dialogrec.h"
 #include "ui_dialogrec.h"
+#include "utils/utils.h"
 
 
 DialogRec::DialogRec(QWidget *parent):
@@ -34,7 +35,10 @@ DialogRec::DialogRec(QWidget *parent):
             tcpSocket->write("FileHead recv");
         }else{
             //接收处理文件
-            qint64 len = file.write(buf);
+            char *tmp = new char[buf.size()];
+            decode(tmp);
+            qint64 len = file.write(tmp);
+            delete []tmp;
             recvSize += len;
             if(recvSize == fileSize){//接收完毕
                 file.close();
