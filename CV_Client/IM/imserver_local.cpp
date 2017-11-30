@@ -67,7 +67,20 @@ void Distributor::msg_distribution(SOCKET ClientSocket)
     int recvbuflen = LINE_BUF;
     do {
 #ifdef ENCRYPT
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+        /*
+        char recvbuf_tmp[LINE_BUF] = {0};
+        iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
+        qDebug()  << "recvbuf_tmp is" << recvbuf_tmp;
+        AES_utils::Instance().decrypt(recvbuf_tmp,iResult, recvbuf);
+        qDebug() << "recvbuf is" << recvbuf;
+        */
+        char recvbuf_tmp[LINE_BUF] = {0};
+        iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
+        printf("recv is %x", recvbuf_tmp);
+        QString decRes = clsEncrypt::deEncrypt(QString(recvbuf_tmp));
+        const char *test = decRes.toStdString().c_str();
+        memcpy(recvbuf, test,LINE_BUF);
+        qDebug() << "recvbuf is" << decRes;
 #else
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 #endif

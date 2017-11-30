@@ -3,6 +3,7 @@
 #include <string>
 #include "protocol/jspp.h"
 #include "AES.h"
+#include "clsEncrypt.h"
 using std::string;
 
 JSPP parse(string json_str);
@@ -15,7 +16,7 @@ public:
             static AES_utils aes;
             return aes;
     }
-    int encrypt(char *in, size_t src_len, char *out);
-    int decrypt(char *in, size_t src_len, char *out);
+    int decrypt(unsigned char *in, size_t src_len, unsigned char *out);
+    int encrypt(unsigned char *in, size_t src_len, unsigned char *out);
 };
 #endif // UTILS_H

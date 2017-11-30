@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <QJsonObject>
 #include <QJsonDocument>
+
 JSPP parse(string json_str)
 {
     JSPP jspp_msg;
@@ -51,15 +52,17 @@ AES_utils::AES_utils()
     moo.set_iv(iv);
 }
 
-int AES_utils::encrypt(char *in, size_t src_len, char *out)
+int AES_utils::encrypt(unsigned char *in, size_t src_len, unsigned char *out)
 {
+
     char *temp = new char[src_len];
     memcpy(temp, in, src_len);
     int len = moo.Encrypt((unsigned char *)temp, src_len, (unsigned char *)out);
     return len;
+
 }
 
-int AES_utils::decrypt(char *in, size_t src_len, char *out)
+int AES_utils::decrypt(unsigned char *in, size_t src_len, unsigned char *out)
 {
     int len = moo.Decrypt((unsigned char *)in, src_len, (unsigned char *)out);
     return len;

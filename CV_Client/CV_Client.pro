@@ -35,7 +35,9 @@ SOURCES += main.cpp\
     src/ui/regisdialog.cpp \
     src/ui/clickablelabel.cpp \
     src/ui/forgotdia.cpp \
-    utils/AES.cpp
+    utils/AES.cpp \
+    utils/clsEncrypt.cpp \
+    utils/TAesClass.cpp
 
 HEADERS  += \
     src/ui/loginform.h \
@@ -59,7 +61,10 @@ HEADERS  += \
     src/ui/regisdialog.h \
     src/ui/clickablelabel.h \
     src/ui/forgotdia.h \
-    utils/AES.h
+    utils/AES.h \
+    utils/clsEncrypt.h \
+    utils/TAesClass.h \
+    utils/thread_pool.h
 
 FORMS    += \
     src/ui/loginform.ui \
