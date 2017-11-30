@@ -53,6 +53,7 @@ private:
 //    void loginOK();
     void loginOK(User *self, map<string, IP_PORT> user_ip);
     void portOK();
+    QString getIP();
 };
 
 class ServerWorker : public QObject

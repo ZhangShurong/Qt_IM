@@ -2,10 +2,45 @@
 #include "user.h"
 #include <iostream>
 #include <QMessageBox>
+#include <WS2tcpip.h>
+#include <cstdlib>
+#include <WinSock2.h>
 #include "connection.h"
 #include "conversation.h"
 #include "user.h"
+SOCKET IMClient::connectPeer(std::string peer_id)
+{
+    if(frient_ip_map.find(peer_id) == frient_ip_map.end())
+        return INVALID_SOCKET;
+    SOCKET self_sock = INVALID_SOCKET;
+    // Resolve the server address and port
+    string add = IP_PORT(frient_ip_map[peer_id]).address;
+    string port = IP_PORT(frient_ip_map[peer_id]).port;
 
+    sockaddr_in hostAddr;
+    hostAddr.sin_family = AF_INET;
+    hostAddr.sin_port = htons(QString::fromStdString(port).toShort());
+    in_addr addr;
+    qDebug() << "ip:" << QString::fromStdString(add) << endl;
+    addr.S_un.S_addr = inet_addr(add.c_str());
+    hostAddr.sin_addr = addr;
+    qDebug() << "ip:" << addr.S_un.S_addr << endl;
+    self_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (self_sock == INVALID_SOCKET)
+    {
+        qDebug() << "conSock failed" << endl;
+        return INVALID_SOCKET;
+    }
+    int err = ::connect(self_sock, (sockaddr*)&hostAddr, sizeof(sockaddr));
+    if (err == INVALID_SOCKET)
+    {
+        qDebug() << "conSock failed" << endl;
+        return INVALID_SOCKET;
+    }
+    //closesocket(self_sock);
+    return self_sock;
+}
+/*
 SOCKET IMClient::connectPeer(std::string peer_id)
 {
     if(frient_ip_map.find(peer_id) == frient_ip_map.end())
@@ -17,7 +52,7 @@ SOCKET IMClient::connectPeer(std::string peer_id)
     int iResult;
 
     ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
@@ -61,7 +96,7 @@ SOCKET IMClient::connectPeer(std::string peer_id)
     //closesocket(self_sock);
     return self_sock;
 }
-
+*/
 
 
 void IMClient::pushMsg(JSPP msg)

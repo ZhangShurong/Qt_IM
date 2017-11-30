@@ -1,13 +1,13 @@
 #include "loginform.h"
 #include "ui_loginform.h"
 #include "mainform.h"
-
+#include <QNetworkInterface>
 #include <iostream>
 #include <QGridLayout>
 #include <QMessageBox>
 #include "regisdialog.h"
 #include "forgotdia.h"
-
+#include "config.h"
 LoginForm::LoginForm(QWidget *parent) :
     MoveableFramelessWindow(parent),
     ui(new Ui::LoginForm)
@@ -31,7 +31,6 @@ LoginForm::LoginForm(QWidget *parent) :
     connect(tcpsocket, SIGNAL(connected()), this, SLOT(connectedSlot()));
     connect(tcpsocket,SIGNAL(readyRead()),this, SLOT(readMessage()));
     connect(tcpsocket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(errorSlot()));
-
 }
 
 LoginForm::~LoginForm()
@@ -48,9 +47,14 @@ QWidget *LoginForm::getDragnWidget()
 
 void LoginForm::doLoginButClick()
 {
+    Config::SERVER_HOST = ui->serverEdit->text().toStdString();
+    Config::SERVER_PORT = ui->portEdit->text().toStdString();
+    Config::SERVER_PORT_NUM = ui->portEdit->text().toInt();
     if(connected)
         connectedSlot();
-    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    tcpsocket->connectToHost(QString::fromStdString(Config::SERVER_HOST),Config::SERVER_PORT_NUM);
+    qDebug() << "Server address is " << QString::fromStdString(Config::SERVER_HOST)
+             << "Server Port is " << Config::SERVER_PORT_NUM;
 }
 
 void LoginForm::connManage()
@@ -200,7 +204,7 @@ void LoginForm::loginOK(User *self, map<string, IP_PORT> user_ip)
     JSPP port_jspp;
     port_jspp.type = "port";
     port_jspp.body = (QString::fromStdString(self->getID())
-                      +"&" + "127.0.0.1:" + QString::fromStdString(port_str)).toStdString();
+                      +"&" + getIP() + ":" + QString::fromStdString(port_str)).toStdString();
 
     QByteArray tmp;
     tmp.append(QString::fromStdString(jspp_to_str(port_jspp)));
@@ -215,4 +219,18 @@ void LoginForm::portOK()
     m->setNick(QString::fromStdString(IMClient::Instance().getCurrID()));
     m->show();
     this->hide();
+}
+QString LoginForm::getIP()  //获取ip地址
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    foreach (QHostAddress address, list){
+        if(address.protocol() == QAbstractSocket::IPv4Protocol){
+            if (address.toString().contains("127.0.")){
+                continue;
+            }
+            if(address.toString().contains("192.168."))
+                return address.toString();
+        }
+    }
+    return "127.0.0.1";
 }

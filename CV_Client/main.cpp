@@ -4,16 +4,13 @@
 #include "src/ui/mainform.h"\
 
 #include <QApplication>
-
+#include "config.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    MainWindow w;
-//    w.show();
-
-    //SlideWindow l;
-
-    //MainForm l;
+    Config::SERVER_HOST = "127.0.0.1";
+    Config::SERVER_PORT = "8000";
+    Config::SERVER_PORT_NUM = 8000;
 
     LoginForm l;
     l.show();

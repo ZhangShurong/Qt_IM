@@ -6,8 +6,8 @@ CV_Server::CV_Server(QWidget *parent) :
     ui(new Ui::CVServer)
 {
     ui->setupUi(this);
-    //ip = getIP();
-    ip = QString("127.0.0.1");
+    ip = getIP();
+    //ip = QString("127.0.0.1");
     ui->textEdit_IP->append(ip);
     ui->textEdit_IP->setReadOnly(true);
     ui->lineEdit->setText("8000");
@@ -175,10 +175,11 @@ QString CV_Server::getIP()  //获取ip地址
             if (address.toString().contains("127.0.")){
                 continue;
             }
-            return address.toString();
+            if(address.toString().contains("192.168."))
+                return address.toString();
         }
     }
-    return 0;
+    return "127.0.0.1";
 }
 
 void CV_Server::on_pushButton_clicked()  //开启服务器；

@@ -1,13 +1,19 @@
-#ifndef CONFIG
-#define CONFIG
+#ifndef CONFIG_IM_H
+#define CONFIG_IM_H
 #include <string>
 #define ENCRYPT
 using std::string;
-const string ADDRESS = "127.0.0.1";
-const string PORT = "1024";
-const int PORT_NUM = 1024;
-const string SERVER_HOST = "127.0.0.1";
-const string SERVER_PORT = "8000";
-const int SERVER_PORT_NUM = 8000;
+class Config{
+
+public:
+    Config() {
+    }
+
+//string SERVER_HOST = "192.168.0.110";
+    static string SERVER_HOST;
+    static string SERVER_PORT;
+    static int SERVER_PORT_NUM;
+};
+
 #endif // CONFIG
 

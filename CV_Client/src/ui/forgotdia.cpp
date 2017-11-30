@@ -5,7 +5,6 @@
 #include "protocol/jspp.h"
 #include "config.h"
 
-
 ForgotDia::ForgotDia(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ForgotDia)
@@ -70,5 +69,5 @@ void ForgotDia::errorSlot()
 
 void ForgotDia::acceptSlot()
 {
-    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    tcpsocket->connectToHost(QString::fromStdString(Config::SERVER_HOST),Config::SERVER_PORT_NUM);
 }

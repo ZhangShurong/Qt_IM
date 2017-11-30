@@ -84,7 +84,9 @@ void DialogRec::on_okBtn_clicked()
     connect(udpsocket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
     port = "10086";
 #else
-    tcpSocket->connectToHost(QString("127.0.0.1"),QString::fromStdString(port).toInt());
+    IP_PORT res;
+    IMClient::Instance().getIP_Port(peer_user,res);
+    tcpSocket->connectToHost(QString::fromStdString(res.address),QString::fromStdString(port).toInt());
 #endif
     //todo 动态获取端口
     QString body = fileName + QString::fromStdString("*#*") + QString::fromStdString(port);

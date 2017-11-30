@@ -6,6 +6,7 @@
 #include <QUdpSocket>
 #include "dialogrec.h"
 #include <strstream>
+#include "config.h"
 using std::strstream;
 
 Chat::Chat(QWidget *parent, User *peer_user) :
@@ -285,7 +286,7 @@ void Chat::initMsgSocket()
     connect(tcpsocket,SIGNAL(readyRead()),this, SLOT(readMessage()));
     connect(tcpsocket,SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(errorSlot()));
     connect(tcpsocket,SIGNAL(disconnected()),this, SLOT(disConnected()));
-    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    tcpsocket->connectToHost(QString::fromStdString(Config::SERVER_HOST),Config::SERVER_PORT_NUM);
 }
 
 void Chat::connectedSlot()
@@ -301,7 +302,7 @@ int Chat::sendOffMsg(string peer_id, string msg)
     msg_json.to = peer_id;
     msg_json.type = "chat";
 
-    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    tcpsocket->connectToHost(QString::fromStdString(Config::SERVER_HOST),Config::SERVER_PORT_NUM);
     if(!connected) {
         qDebug() << "未连接离线消息服务器";
         return -1;

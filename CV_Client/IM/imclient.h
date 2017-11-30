@@ -12,7 +12,6 @@
 #include <list>
 #include <map>
 #include <QTcpSocket>
-#include "config.h"
 #include "user.h"
 #define LINE_BUF 2048
 using std::string;
