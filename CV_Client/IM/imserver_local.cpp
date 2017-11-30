@@ -67,20 +67,18 @@ void Distributor::msg_distribution(SOCKET ClientSocket)
     int recvbuflen = LINE_BUF;
     do {
 #ifdef ENCRYPT
-        /*
         char recvbuf_tmp[LINE_BUF] = {0};
         iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
-        qDebug()  << "recvbuf_tmp is" << recvbuf_tmp;
-        AES_utils::Instance().decrypt(recvbuf_tmp,iResult, recvbuf);
-        qDebug() << "recvbuf is" << recvbuf;
-        */
-        char recvbuf_tmp[LINE_BUF] = {0};
-        iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
-        printf("recv is %x", recvbuf_tmp);
-        QString decRes = clsEncrypt::deEncrypt(QString(recvbuf_tmp));
+        printf("recv is %s\n", recvbuf_tmp);
+        QByteArray buf(recvbuf_tmp);
+        QString recv_qstr = QString::fromLatin1(buf);
+
+        QString decRes = clsEncrypt::deEncrypt(recv_qstr.split("\n\n")[0]);
         const char *test = decRes.toStdString().c_str();
-        memcpy(recvbuf, test,LINE_BUF);
-        qDebug() << "recvbuf is" << decRes;
+        memcpy(recvbuf, recvbuf_tmp,LINE_BUF);
+        qDebug() << "recvbuf is" << decRes
+                 << "recv size is " <<decRes.size()
+                 << "decRes size is " << recv_qstr.split("\n\n")[0].size();
 #else
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 #endif

@@ -19,10 +19,10 @@ QString clsEncrypt::encrypt(QString value)
 {
     TAesClass *aes = new TAesClass;
 
-    char mingwen[strLength];
+    char mingwen[strLength] = {0};
     strcpy(mingwen,value.toLatin1().data());
     DWORD size = strlen(mingwen);
-    char miwen[strLength];
+    char miwen[strLength] = {0};
 
     UCHAR key[50] = "Wayne Kerr Electronics";
     UCHAR *p = key;
@@ -31,7 +31,7 @@ QString clsEncrypt::encrypt(QString value)
 
     free(aes);
     aes = 0;
-    return QString(QLatin1String(miwen));
+    return QString(mingwen);
 }
 
 /*!
@@ -43,17 +43,17 @@ QString clsEncrypt::encrypt(QString value)
 QString clsEncrypt::deEncrypt(QString value)
 {
     TAesClass *aes = new TAesClass;
-    char jiemi[strLength];
+    char jiemi[strLength] = {0};
 
     UCHAR key[50] = "Wayne Kerr Electronics";
     UCHAR *p = key;
     aes->InitializePrivateKey(16, p); //进行初始化
     QString strMiWen =value;
-    char MiWen[strLength];
+    char MiWen[strLength] = {0};
     strcpy(MiWen, strMiWen.toLatin1().data());
     aes->OnAesUncrypt((LPVOID)MiWen, (DWORD)sizeof(MiWen),(LPVOID)jiemi); //进行解密
     free(aes);
     aes = 0;
-    return QString(QLatin1String(jiemi));
+    return QString(jiemi);
 }
 
