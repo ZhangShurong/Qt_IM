@@ -40,3 +40,36 @@ string jspp_to_str(const JSPP msg_json)
     QString strJson(byteArray);
     return strJson.toStdString();
 }
+//加密
+void encode(char *pstr){
+    int len = strlen(pstr);//获取长度
+    for (int i = 0; i < len; i++)
+        *(pstr + i) = *(pstr + i) ^ i;
+}
+
+//解密
+void decode(char *pstr){
+    int len = strlen(pstr);
+    for (int i = 0; i < len; i++)
+        *(pstr + i) = *(pstr + i) ^ i;
+}
+
+
+QString encodeQstr(QString src)
+{
+    char *tmp = new char[src.size()];
+    memcpy(tmp, src.toStdString().c_str(), src.size());
+    encode(tmp);
+    QString res(tmp);
+    delete[] tmp;
+    return res;
+}
+QString decodeQstr(QString src)
+{
+    char *tmp = new char[src.size()];
+    memcpy(tmp, src.toStdString().c_str(), src.size());
+    decode(tmp);
+    QString res(tmp);
+    delete[] tmp;
+    return res;
+}
