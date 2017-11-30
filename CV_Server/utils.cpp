@@ -57,8 +57,8 @@ void decode(char *pstr){
 
 QString encodeQstr(QString src)
 {
-    char *tmp = new char[src.size()];
-    memcpy(tmp, src.toStdString().c_str(), src.size());
+    QByteArray ba = src.toLatin1();
+    char* tmp = ba.data();
     encode(tmp);
     QString res(tmp);
     delete[] tmp;
@@ -66,8 +66,8 @@ QString encodeQstr(QString src)
 }
 QString decodeQstr(QString src)
 {
-    char *tmp = new char[src.size()];
-    memcpy(tmp, src.toStdString().c_str(), src.size());
+    QByteArray ba = src.toLatin1();
+    char* tmp = ba.data();
     decode(tmp);
     QString res(tmp);
     delete[] tmp;
