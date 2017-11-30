@@ -8,6 +8,12 @@ using std::string;
 
 JSPP parse(string json_str);
 string jspp_to_str(const JSPP msg_json);
+//加密
+void encode(char *pstr);
+
+//解密
+void decode(char *pstr);
+
 class AES_utils{
     AES_utils();
     AESModeOfOperation moo;

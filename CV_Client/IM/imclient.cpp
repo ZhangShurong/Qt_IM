@@ -130,17 +130,11 @@ int IMClient::sendMsg(JSPP msg)
     const char *sendbuf = send_str.c_str();
     // Send an initial buffer
 #ifdef ENCRYPT
-
-    QString encRes = clsEncrypt::encrypt(QString::fromStdString(send_str));
-    encRes.append("\n\n");
-    QByteArray sndArray(encRes.toLatin1());
-    printf("send is %x", sndArray.data());
-    QByteArray newArray = sndArray;
-    const char* testSnd = sndArray.data();
-    int iResult = send( self_sock, sndArray.data(), sndArray.size(), 0 );
-    qDebug() << "encRes is" <<testSnd
-             << "sndArray.size() is" << sndArray.size()
-             << "and dncRes is " << clsEncrypt::deEncrypt(QString(newArray));
+    char *realSnd = new char[send_str.size()];
+    memcpy(realSnd, sendbuf, send_str.size());
+    encode(realSnd);
+    printf("send is %s", realSnd);
+    int iResult = send( self_sock, realSnd, send_str.size(), 0 );
 #else
     int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
 #endif

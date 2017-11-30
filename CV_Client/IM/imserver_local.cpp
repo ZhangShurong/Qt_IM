@@ -70,15 +70,8 @@ void Distributor::msg_distribution(SOCKET ClientSocket)
         char recvbuf_tmp[LINE_BUF] = {0};
         iResult = recv(ClientSocket, recvbuf_tmp, recvbuflen, 0);
         printf("recv is %s\n", recvbuf_tmp);
-        QByteArray buf(recvbuf_tmp);
-        QString recv_qstr = QString::fromLatin1(buf);
-
-        QString decRes = clsEncrypt::deEncrypt(recv_qstr.split("\n\n")[0]);
-        const char *test = decRes.toStdString().c_str();
+        decode(recvbuf_tmp);
         memcpy(recvbuf, recvbuf_tmp,LINE_BUF);
-        qDebug() << "recvbuf is" << decRes
-                 << "recv size is " <<decRes.size()
-                 << "decRes size is " << recv_qstr.split("\n\n")[0].size();
 #else
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 #endif
