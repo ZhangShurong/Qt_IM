@@ -92,6 +92,8 @@ private:
 #endif
     string initFileServer();
     void sendData();
+    QString insertLeft(QString msg);
+    QString insertRight(QString msg);
 };
 
 #endif // CHAT_H

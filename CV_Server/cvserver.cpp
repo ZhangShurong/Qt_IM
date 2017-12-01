@@ -129,7 +129,7 @@ void CV_Server::readMessage()
         JSPP res;
         res.type = "port";
         IP_PORT insertS;
-        insertS.address = add_port[0].toStdString();
+        insertS.address = socket->peerAddress().toString().toStdString();
         insertS.port = add_port[1].toStdString();
         if(0 != db->intsertMap(insertS, userName.toStdString())) {
             res.code = "1";

@@ -257,7 +257,10 @@ vector<JSPP> ServerDB::getMsg(std::string to)
     {
         while(sql_query.next())
         {
-            res.push_back(parse(decodeQstr(sql_query.value(0).toString()).toStdString()));
+            QString x, y;
+            y = sql_query.value(0).toString();
+            x = decodeQstr(sql_query.value(0).toString());
+            res.push_back(parse(x.toStdString()));
         }
         deleteMsg(to);
 

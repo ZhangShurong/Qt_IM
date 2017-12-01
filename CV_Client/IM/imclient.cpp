@@ -19,7 +19,7 @@ SOCKET IMClient::connectPeer(std::string peer_id)
 
     sockaddr_in hostAddr;
     hostAddr.sin_family = AF_INET;
-    hostAddr.sin_port = htons(QString::fromStdString(port).toShort());
+    hostAddr.sin_port = htons(QString::fromStdString(port).toInt());
     in_addr addr;
     qDebug() << "ip:" << QString::fromStdString(add) << endl;
     addr.S_un.S_addr = inet_addr(add.c_str());

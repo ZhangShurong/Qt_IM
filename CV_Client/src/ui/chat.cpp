@@ -392,3 +392,56 @@ void Chat::sendData()
     }while(len > 0);
     printf("\nSend Over");
 }
+
+
+QString Chat::insertLeft(QString msg)
+{
+    QString str = "<div class=\"sender\" style=\"clear:both;\">"
+                  "<div style=\"float: left;\">"
+                  "<img style = \"width:50px;"
+                  "height: 50px;\" src=\"../img/us_flag.png\" height=\"462\" width=\"427\"/></div>"
+                  "<div style=\"background-color: aquamarine;"
+                  "float: left;"
+                  "margin: 0 20px 10px 15px;"
+                  "padding: 10px 10px 10px 0px;"
+                  "border-radius:7px;\">"
+                  "<div style=\"height:0px;"
+                  "width:0px;"
+                  "border-width:8px;"
+                  "border-style:solid;"
+                  "border-color:transparent aquamarine transparent transparent;"
+                  "position: relative;"
+                  "left:-16px;"
+                  "top:3px;"
+                  "class=\"left_triangle\"></div>"
+                  "<span>"+msg+"</span>"
+                               "</div>"
+                               "</div>";
+    return str;
+}
+
+QString Chat::insertRight(QString msg)
+{
+    QString str = "<div class=\"receiver\" style=\"clear:both;\">"
+                  "<div style=\"float: right;\">"
+                  "<img style = \"width:50px;"
+                  "height: 50px;\"  src=\"../rs/media/person/9.jpg\"/></div>"
+                  "<div style=\" float:right;"
+                  "background-color: gold;"
+                  "margin: 0 10px 10px 20px;"
+                  "padding: 10px 0px 10px 10px;"
+                  "border-radius:7px;\">"
+                  "<div style=\"height:0px;"
+                  "width:0px;"
+                  "border-width:8px;"
+                  "border-style:solid;"
+                  "border-color:transparent transparent transparent gold;"
+                  "position: relative;"
+                  "right:-16px;"
+                  "top:3px;\""
+                  "class=\"right_triangle\"></div>"
+                  "<span>"+msg+"</span>"
+                               "</div>"
+                               "</div>";
+    return str;
+}

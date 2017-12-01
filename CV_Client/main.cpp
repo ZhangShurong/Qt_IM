@@ -13,7 +13,7 @@ int SERVER_PORT_NUM;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SERVER_HOST = "127.0.0.1";
+    SERVER_HOST = "10.10.254.229";
     SERVER_PORT = "8000";
     SERVER_PORT_NUM = 8000;
 

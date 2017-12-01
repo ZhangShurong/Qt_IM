@@ -130,7 +130,7 @@
          <item>
           <widget class="QLabel" name="label_signal">
            <property name="text">
-            <string>Happer new year!</string>
+            <string>Happy New Year!</string>
            </property>
           </widget>
          </item>
