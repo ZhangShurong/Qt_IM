@@ -176,6 +176,8 @@ QString CV_Server::getIP()  //获取ip地址
                 continue;
             }
             if(address.toString().contains("192.168."))
+                continue;
+            if(address.toString().contains("10."))
                 return address.toString();
         }
     }

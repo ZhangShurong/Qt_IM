@@ -4,9 +4,9 @@
 #define ENCRYPT
 using std::string;
 
-static string SERVER_HOST;
-static string SERVER_PORT;
-static int SERVER_PORT_NUM;
+extern string SERVER_HOST;
+extern string SERVER_PORT;
+extern int SERVER_PORT_NUM;
 
 #endif // CONFIG
 
