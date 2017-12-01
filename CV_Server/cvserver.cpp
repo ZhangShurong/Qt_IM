@@ -194,16 +194,10 @@ void CV_Server::removeUserFormList()
     QString tmp;
 
     QTcpSocket* socket = static_cast<QTcpSocket*>(sender());
-    //    QTcpSocket *tcp = tcpServer->nextPendingConnection();
 
     socket->peerAddress().toString();
 
     if(userList.removeOne(socket)){
-        /*
-        tmp.append(socket->peerAddress().toString());
-        tmp.append("断开了连接！");
-        ui->textEdit->append(tmp);
-        */
         list();
     }
 

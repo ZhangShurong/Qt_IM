@@ -12,6 +12,7 @@
 #include "IM/imclient.h"
 #include <QMessageBox>
 #include <QTcpServer>
+#include <QDateTime>
 
 #define TCP
 #define BUF_SIZE 4096
@@ -36,6 +37,7 @@ class DialogRec : public QDialog
     int fileSize;
     int recvSize;
     QFile file;
+    qint64 start_date_time;
 #endif
 
 public:

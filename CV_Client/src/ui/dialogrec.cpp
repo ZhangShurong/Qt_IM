@@ -10,7 +10,6 @@ DialogRec::DialogRec(QWidget *parent):
     ui->setupUi(this);
     this->setWindowTitle(tr("文件传输！"));
     port = "0";
-
 #ifndef TCP
     udpsocket = new QUdpSocket();
 #else
@@ -40,6 +39,7 @@ DialogRec::DialogRec(QWidget *parent):
             tcpSocket->write("FileHead recv");
             tcpSocket->flush();
         }else{
+            start_date_time  = QDateTime::currentMSecsSinceEpoch();
             //接收处理文件
             qint64 len = file.write(buf);
             recvSize += len;
@@ -47,7 +47,9 @@ DialogRec::DialogRec(QWidget *parent):
             if(recvSize >= fileSize){//接收完毕
                 file.close();
                 //提示信息
-                QMessageBox::information(this,"完成","文件接收完成");
+               qint64  interval = QDateTime::currentMSecsSinceEpoch() - start_date_time;
+                QMessageBox::warning(this,tr("通知"),QString("接收完成,耗时") + QString::number(interval),QMessageBox::Yes);
+                //QMessageBox::information(this,"完成","文件接收完成");
                 //回射信息
                 tcpSocket->write("file write done");
                 tcpSocket->flush();
@@ -120,6 +122,7 @@ void DialogRec::readPendingDatagrams()
 
     file.close();
     //udpsocket->close();
-    QMessageBox::warning(this,tr("通知"),tr("接收完成"),QMessageBox::Yes);
+    //uint interval = QDateTime::currentDateTime().toTime_t() - start_date_time->toTime_t();
+    //QMessageBox::warning(this,tr("通知"),QString("接收完成,耗时") + QString::number(interval),QMessageBox::Yes);
     hide();
 }

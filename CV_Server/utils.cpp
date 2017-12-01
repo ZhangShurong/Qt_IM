@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QStringList>
 JSPP parse(string json_str)
 {
     JSPP jspp_msg;
@@ -72,7 +73,7 @@ QString encodeQstr(QString src)
     for(int i = 0; i < src.size(); ++i)
     {
         res += c + QString::number((int)tmp[i]);
-        c = "&";
+        c = "#$#";
     }
     delete []tmp;
     return res;
@@ -80,12 +81,13 @@ QString encodeQstr(QString src)
 
 QString decodeQstr(QString src)
 {
-    QStringList input =  src.split("&");
-    char *input_arr = new char[input.size()];
+    QStringList input =  src.split("#$#");
+    char *input_arr = new char[input.size() + 1];
     for(int i = 0; i < input.size(); ++i) {
         input_arr[i] = input[i].toInt();
     }
     decode(input_arr, input.size());
+    input_arr[input.size()] = 0;
     QString res(input_arr);
     delete[] input_arr;
     return res;
