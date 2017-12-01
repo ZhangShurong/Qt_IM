@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Servers_1</string>
+   <string>服务器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>myappico.ico</normaloff>myappico.ico</iconset>
   </property>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
