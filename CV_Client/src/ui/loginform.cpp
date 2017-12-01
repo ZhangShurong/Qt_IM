@@ -47,14 +47,14 @@ QWidget *LoginForm::getDragnWidget()
 
 void LoginForm::doLoginButClick()
 {
-    Config::SERVER_HOST = ui->serverEdit->text().toStdString();
-    Config::SERVER_PORT = ui->portEdit->text().toStdString();
-    Config::SERVER_PORT_NUM = ui->portEdit->text().toInt();
+    SERVER_HOST = ui->serverEdit->text().toStdString();
+    SERVER_PORT = ui->portEdit->text().toStdString();
+    SERVER_PORT_NUM = ui->portEdit->text().toInt();
     if(connected)
         connectedSlot();
-    tcpsocket->connectToHost(QString::fromStdString(Config::SERVER_HOST),Config::SERVER_PORT_NUM);
-    qDebug() << "Server address is " << QString::fromStdString(Config::SERVER_HOST)
-             << "Server Port is " << Config::SERVER_PORT_NUM;
+    tcpsocket->connectToHost(QString::fromStdString(SERVER_HOST),SERVER_PORT_NUM);
+    qDebug() << "Server address is " << QString::fromStdString(SERVER_HOST)
+             << "Server Port is " << SERVER_PORT_NUM;
 }
 
 void LoginForm::connManage()

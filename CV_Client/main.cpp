@@ -8,9 +8,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Config::SERVER_HOST = "127.0.0.1";
-    Config::SERVER_PORT = "8000";
-    Config::SERVER_PORT_NUM = 8000;
+    SERVER_HOST = "127.0.0.1";
+    SERVER_PORT = "8000";
+    SERVER_PORT_NUM = 8000;
 
     LoginForm l;
     l.show();
