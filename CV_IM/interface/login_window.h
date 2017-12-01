@@ -7,7 +7,7 @@ Changes：
 #define LOGINWINDOW_H
 
 #include <QMainWindow>
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "communication/protocal.h"
 #include "click_label.h"
 #include "interface/main_window.h"

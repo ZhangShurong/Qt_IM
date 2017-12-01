@@ -62,23 +62,31 @@ void decode(char *pstr,int len_a){
         *(pstr + i) = *(pstr + i) ^ i;
 }
 
-
 QString encodeQstr(QString src)
 {
-    QByteArray ba = src.toStdString().c_str();
-    char* tmp = ba.data();
-    encode(tmp, ba.size());
-    QString res(tmp);
-    delete[] tmp;
+    char *tmp = new char[src.size()];
+    memcpy(tmp, src.toStdString().c_str(),src.size());
+    encode(tmp,src.size());
+    QString res;
+    QString c = "";
+    for(int i = 0; i < src.size(); ++i)
+    {
+        res += c + QString::number((int)tmp[i]);
+        c = "&";
+    }
+    delete []tmp;
     return res;
 }
+
 QString decodeQstr(QString src)
 {
-    QByteArray ba = src.toStdString().c_str();
-    char* tmp = ba.data();
-    decode(tmp, ba.size());
-    QString res(tmp);
-    delete[] tmp;
+    QStringList input =  src.split("&");
+    char *input_arr = new char[input.size()];
+    for(int i = 0; i < input.size(); ++i) {
+        input_arr[i] = input[i].toInt();
+    }
+    decode(input_arr, input.size());
+    QString res(input_arr);
+    delete[] input_arr;
     return res;
-
 }
