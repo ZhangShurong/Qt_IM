@@ -38,7 +38,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">border-image:url(&quot;://images/11.jpg&quot;);
+     <string notr="true">border-image:url(&quot;://sys/img/sf.jpg&quot;);
 border-radius:2px;</string>
     </property>
     <property name="text">
@@ -357,6 +357,8 @@ QPushButton:hover{
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../rs/rs.qrc"/>
+ </resources>
  <connections/>
 </ui>

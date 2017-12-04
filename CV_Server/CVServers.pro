@@ -21,12 +21,15 @@ SOURCES += main.cpp \
     jspp.cpp \
     serverdb.cpp
 
-HEADERS  += \
+HEADERS += \
     cvserver.h \
     user.h \
     utils.h \
     jspp.h \
     serverdb.h
 
-FORMS    += \
+RESOURCES += \
+    rs.qrc
+
+FORMS += \
     cvserver.ui

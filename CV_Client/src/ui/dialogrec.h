@@ -52,6 +52,7 @@ private slots:
 
 private:
     Ui::DialogRec *ui;
+    int time;
 
 };
 

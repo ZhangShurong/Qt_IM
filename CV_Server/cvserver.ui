@@ -14,8 +14,8 @@
    <string>服务器</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>myappico.ico</normaloff>myappico.ico</iconset>
+   <iconset resource="rs.qrc">
+    <normaloff>:/myappico.ico</normaloff>:/myappico.ico</iconset>
   </property>
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
@@ -114,6 +114,8 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="rs.qrc"/>
+ </resources>
  <connections/>
 </ui>

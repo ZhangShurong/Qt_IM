@@ -7,8 +7,9 @@ DialogRec::DialogRec(QWidget *parent):
     QDialog(parent),
     ui(new Ui::DialogRec)
 {
+    time = 0;
     ui->setupUi(this);
-    this->setWindowTitle(tr("文件传输！"));
+    this->setWindowTitle(tr("文件传输"));
     port = "0";
 #ifndef TCP
     udpsocket = new QUdpSocket();
@@ -38,17 +39,24 @@ DialogRec::DialogRec(QWidget *parent):
             }
             tcpSocket->write("FileHead recv");
             tcpSocket->flush();
+            time = 0;
         }else{
             start_date_time  = QDateTime::currentMSecsSinceEpoch();
             //接收处理文件
+            if(!time){
+                start_date_time  = QDateTime::currentMSecsSinceEpoch();
+            }
+            time++;
             qint64 len = file.write(buf);
             recvSize += len;
-            qDebug() << "%" << recvSize/fileSize;
+            qDebug() << "time" << time << "%" << recvSize << "%" << fileSize;
             if(recvSize >= fileSize){//接收完毕
                 file.close();
                 //提示信息
-               qint64  interval = QDateTime::currentMSecsSinceEpoch() - start_date_time;
-                QMessageBox::warning(this,tr("通知"),QString("接收完成,耗时") + QString::number(interval),QMessageBox::Yes);
+                qint64  interval = QDateTime::currentMSecsSinceEpoch() - start_date_time;
+                float rate = (file.size() * 8 * 1000 ) / (interval * 1048576);
+                QMessageBox::warning(this,tr("通知"),QString("接收完成，传输平均速率：") + QString("%1").arg(rate)+ QString("Mbps") + QString("\n")
+                                     + QString("文件大小：") + QString::number(file.size()/1024) + QString("kB") + QString(" 时间：") + QString::number(interval) + QString("ms"), QMessageBox::Yes);
                 //QMessageBox::information(this,"完成","文件接收完成");
                 //回射信息
                 tcpSocket->write("file write done");
@@ -64,7 +72,7 @@ void DialogRec::setFileReq(JSPP fileReq)
 {
     fileName = QString::fromStdString(fileReq.body).split("&")[0];;
     peer_user = fileReq.from;
-    ui->label->setText(QString::fromStdString(peer_user) +
+    ui->label->setText("用户"+ QString::fromStdString(peer_user) +
                        "向您发送文件" +
                        fileName.split("/").back() +
                        "是否接收？");

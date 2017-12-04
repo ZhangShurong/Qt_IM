@@ -151,12 +151,18 @@ void LoginForm::readMessage()
 
 void LoginForm::doRegisClick()
 {
+    SERVER_HOST = ui->serverEdit->text().toStdString();
+    SERVER_PORT = ui->portEdit->text().toStdString();
+    SERVER_PORT_NUM = ui->portEdit->text().toInt();
     RegisDialog *r_dia = new RegisDialog();
     r_dia->show();
 }
 
 void LoginForm::doForgetPwd()
 {
+    SERVER_HOST = ui->serverEdit->text().toStdString();
+    SERVER_PORT = ui->portEdit->text().toStdString();
+    SERVER_PORT_NUM = ui->portEdit->text().toInt();
     ForgotDia *dia = new ForgotDia();
     dia->show();
 }

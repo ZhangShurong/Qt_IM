@@ -106,14 +106,14 @@ void Chat::recvMsg(QString msg)
 {
     qDebug()<<msg.length();
     if(msg.length()>=23){
-        QString s1="<img width='30' height='30' src='qrc:/10.jpeg' style='float:left;margin-right:15px;margin-left:15px;'><div style='background:rgb(205,215,226);padding-top:8px;float:left;margin-top:10px;margin-left:45px;padding:10px;margin-right:60px;'><span style='font-size:15px;font-family:'Microsoft YaHei';margin-top:2px;'>"+msg+"</span></div><br><br><br>";
+        QString s1="<img width='30' height='30' src='://sys/img/sf.jpg' style='float:left;margin-right:15px;margin-left:15px;'><div style='background:rgb(205,215,226);padding-top:8px;float:left;margin-top:10px;margin-left:45px;padding:10px;margin-right:60px;'><span style='font-size:15px;font-family:'Microsoft YaHei';margin-top:2px;'>"+msg+"</span></div><br><br><br>";
         ui->textBrowser->insertHtml(s1);
     }
     else{
         int flag=60+(24-msg.length())*15;
         QString myflag=QString::number(flag, 10);;
         qDebug()<<myflag;
-        QString s1="<img width='30' height='30' src='qrc:/10.jpeg' style='float:left;margin-right:15px;margin-left:15px;'><div style='background:rgb(205,215,226);padding-top:8px;float:left;margin-top:10px;margin-left:45px;padding:10px;margin-right:"+myflag+"px;'>";
+        QString s1="<img width='30' height='30' src='://sys/img/sf.jpg' style='float:left;margin-right:15px;margin-left:15px;'><div style='background:rgb(205,215,226);padding-top:8px;float:left;margin-top:10px;margin-left:45px;padding:10px;margin-right:"+myflag+"px;'>";
         s1+="<span style='font-size:15px;font-family:'Microsoft YaHei';margin-top:2px;'>"+msg+"</span></div><br><br><br>";
         qDebug()<<s1;
         ui->textBrowser->insertHtml(s1);
@@ -149,8 +149,10 @@ void Chat::showEvent(QShowEvent *event)
     mouse_press=false;
     // if(!conv)
     //   conv = IMClient::Instance().getConversation(peer_user->getID());
+    reqMsg();
     connect(timer, SIGNAL(timeout()), this, SLOT(checkMsg()));
     timer->start(100);
+
 }
 
 void Chat::checkMsg()
@@ -292,7 +294,7 @@ void Chat::initMsgSocket()
 void Chat::connectedSlot()
 {
     connected = true;
-    reqMsg();
+//    reqMsg();
 }
 int Chat::sendOffMsg(string peer_id, string msg)
 {

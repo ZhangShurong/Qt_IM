@@ -6,45 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>234</width>
+    <width>315</width>
     <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>文件传输</string>
   </property>
-  <widget class="QPushButton" name="okBtn">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>60</y>
-     <width>41</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>是</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="noBtn">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>60</y>
-     <width>41</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>否</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>181</width>
+     <width>291</width>
      <height>41</height>
     </rect>
    </property>
@@ -52,8 +26,40 @@
     <string/>
    </property>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>60</y>
+     <width>158</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="okBtn">
+      <property name="text">
+       <string>是</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="noBtn">
+      <property name="text">
+       <string>否</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <zorder>okBtn</zorder>
+  <zorder>noBtn</zorder>
+  <zorder>label</zorder>
+  <zorder>noBtn</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../rs/rs.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>noBtn</sender>
