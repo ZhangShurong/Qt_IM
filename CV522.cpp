@@ -43,10 +43,10 @@ int main()
 
     for (int i = 2; i <= n; i++) {
 	for (int j = 0; j < k; j++) {
-	    if (check_two_line(i, j))	//判断第i行 假如按状态j放牛的话行不行。
+	    if (check_two_line(i, j))
 		continue;
 	    for (int f = 0; f < k; f++) {
-		if (check_two_line(i - 1, f))	//剪枝 判断上一行与其状态是否满足
+		if (check_two_line(i - 1, f))
 		    continue;
 		if (!(state[j] & state[f]))
 		    dp[i][j] += dp[i - 1][f];
