@@ -1,3 +1,4 @@
+//http://www.cnblogs.com/ka200812/archive/2011/08/11/2135607.html
 #include <iostream>
 #include <cstring>
 #include <iostream>
