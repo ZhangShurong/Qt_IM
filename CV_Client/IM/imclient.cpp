@@ -2,101 +2,36 @@
 #include "user.h"
 #include <iostream>
 #include <QMessageBox>
-#include <WS2tcpip.h>
 #include <cstdlib>
-#include <WinSock2.h>
 #include "connection.h"
 #include "conversation.h"
 #include "user.h"
-SOCKET IMClient::connectPeer(std::string peer_id)
+
+QTcpSocket* IMClient::connectPeer(std::string peer_id)
 {
     if(frient_ip_map.find(peer_id) == frient_ip_map.end())
-        return INVALID_SOCKET;
-    SOCKET self_sock = INVALID_SOCKET;
-    // Resolve the server address and port
-    string add = IP_PORT(frient_ip_map[peer_id]).address;
-    string port = IP_PORT(frient_ip_map[peer_id]).port;
-
-    sockaddr_in hostAddr;
-    hostAddr.sin_family = AF_INET;
-    hostAddr.sin_port = htons(QString::fromStdString(port).toInt());
-    in_addr addr;
-    qDebug() << "ip:" << QString::fromStdString(add) << endl;
-    addr.S_un.S_addr = inet_addr(add.c_str());
-    hostAddr.sin_addr = addr;
-    qDebug() << "ip:" << addr.S_un.S_addr << endl;
-    self_sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (self_sock == INVALID_SOCKET)
-    {
-        qDebug() << "conSock failed" << endl;
-        return INVALID_SOCKET;
-    }
-    int err = ::connect(self_sock, (sockaddr*)&hostAddr, sizeof(sockaddr));
-    if (err == INVALID_SOCKET)
-    {
-        qDebug() << "conSock failed" << endl;
-        return INVALID_SOCKET;
-    }
-    //closesocket(self_sock);
-    return self_sock;
-}
-/*
-SOCKET IMClient::connectPeer(std::string peer_id)
-{
-    if(frient_ip_map.find(peer_id) == frient_ip_map.end())
-        return INVALID_SOCKET;
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-    SOCKET self_sock = INVALID_SOCKET;
-    int iResult;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
+        return nullptr;
 
     // Resolve the server address and port
     string add = IP_PORT(frient_ip_map[peer_id]).address;
     string port = IP_PORT(frient_ip_map[peer_id]).port;
 
-    iResult = getaddrinfo(add.c_str(), port.c_str(), &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        return 1;
+    qDebug() << "Connecting to:" << QString::fromStdString(add)
+             << ":" << QString::fromStdString(port);
+
+    QTcpSocket *socket = new QTcpSocket(this);
+    socket->connectToHost(QString::fromStdString(add),
+                         QString::fromStdString(port).toInt());
+
+    if (!socket->waitForConnected(5000)) {
+        qDebug() << "Connection failed:" << socket->errorString();
+        delete socket;
+        return nullptr;
     }
 
-    // Attempt to connect to an address until one succeeds
-    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
-
-        // Create a SOCKET for connecting to server
-        self_sock = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-        if (self_sock == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
-            return 1;
-        }
-
-        // Connect to server.
-        iResult = ::connect( self_sock, ptr->ai_addr, (int)ptr->ai_addrlen);
-        if (iResult == SOCKET_ERROR) {
-            closesocket(self_sock);
-            self_sock = INVALID_SOCKET;
-            continue;
-        }
-        break;
-    }
-
-    freeaddrinfo(result);
-
-    if (self_sock == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
-        return INVALID_SOCKET;
-    }
-    //closesocket(self_sock);
-    return self_sock;
+    qDebug() << "Connection established";
+    return socket;
 }
-*/
 
 
 void IMClient::pushMsg(JSPP msg)
@@ -153,8 +88,8 @@ int IMClient::sendMsg(string peer_id, string msg)
 
 int IMClient::sendMsg(JSPP msg)
 {
-    SOCKET self_sock = connectPeer(msg.to);
-    if(self_sock == INVALID_SOCKET) {
+    QTcpSocket *self_sock = connectPeer(msg.to);
+    if(!self_sock) {
         //链接失败
         return -1;
     }
@@ -162,31 +97,28 @@ int IMClient::sendMsg(JSPP msg)
 
     string send_str = jspp_to_str(msg_json);
 
-    const char *sendbuf = send_str.c_str();
+    QByteArray sendData(send_str.c_str());
     // Send an initial buffer
 #ifdef ENCRYPT
     char *realSnd = new char[send_str.size() + 1];
     realSnd[send_str.size()] = 0;
-    memcpy(realSnd, sendbuf, send_str.size());
-    encode(realSnd,send_str.size());
-    printf("send is %s", realSnd);
-    int iResult = send( self_sock, realSnd, send_str.size(), 0 );
+    memcpy(realSnd, send_str.c_str(), send_str.size());
+    encode(realSnd, send_str.size());
+    qDebug() << "send is" << realSnd;
+    qint64 iResult = self_sock->write(realSnd, send_str.size());
+    delete[] realSnd;  // Fix memory leak
 #else
-    int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
+    qint64 iResult = self_sock->write(sendData);
 #endif
-    if (iResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(self_sock);
-        self_sock = INVALID_SOCKET;
+    if (iResult < 0) {
+        qDebug() << "send failed with error:" << self_sock->errorString();
+        delete self_sock;
         return -1;
     }
-    printf("Bytes Sent: %ld\n", iResult);
-    closesocket(self_sock);
-#ifdef ENCRYPT
-    //delete []send_tmp;
-    //delete []tmp;
-#endif
-    return iResult;
+    qDebug() << "Bytes Sent:" << iResult;
+    self_sock->close();
+    delete self_sock;
+    return static_cast<int>(iResult);
 }
 
 string IMClient::getCurrID()

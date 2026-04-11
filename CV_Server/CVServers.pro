@@ -7,7 +7,6 @@
 QT       += core gui network sql
 CONFIG += console c++11
 
-LIBS += -lws2_32
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Servers_1

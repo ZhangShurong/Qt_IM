@@ -1,6 +1,6 @@
 #include "view/IMServerWindow.h"
-#include <QtGui/QApplication>
-#include <QtCore/QTextCodec>
+#include <QApplication>
+#include <QTextCodec>
 #include <QSystemSemaphore>
 #include <QSharedMemory>
 #include <QMessageBox>
@@ -8,19 +8,20 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // 以下部分解决中文乱码
+    // Set UTF-8 encoding for localization
+#if QT_VERSION < 0x050000
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf-8"));
-    // 以上部分解决中文乱码
+#endif
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf-8"));
 
-//    //确保只运行一次
+//    // Ensure only one instance runs
 //    QSystemSemaphore sema("IMServerKey",1,QSystemSemaphore::Open);
-//    //在临界区操作共享内存
+//    // Operate shared memory in critical section
 //    sema.acquire();
 //    QSharedMemory mem("IMServerObject");
 
-//    // 如果全局对象以存在则退出
+//    // If global object already exists then exit
 //    if (!mem.create(1))
 //    {
 //        QMessageBox::warning(NULL, "error",
@@ -32,6 +33,6 @@ int main(int argc, char *argv[])
 
     IMServerWindow w;
     w.show();
-    
+
     return a.exec();
 }

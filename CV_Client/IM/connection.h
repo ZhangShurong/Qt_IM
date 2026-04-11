@@ -1,15 +1,11 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 #include <QObject>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <QTcpSocket>
 #include <string>
 #include <vector>
 #include <QTimer>
 #include "utils/utils.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include "IM/imclient.h"
 
 #define LINE_BUF 2048
 using std::string;
@@ -18,8 +14,8 @@ class Connection : public QObject
 {
     Q_OBJECT
 private:
-    SOCKET peer_sock;
-    SOCKET self_sock;
+    QTcpSocket *peer_sock;
+    QTcpSocket *self_sock;
     bool connected;
     string peer_id;
     string self_id;
@@ -36,8 +32,8 @@ private slots:
 public:
     Connection();
     ~Connection();
-    Connection(SOCKET peer_sock);
-    void setPeerSock(SOCKET peer_sock);
+    Connection(QTcpSocket *peer_sock);
+    void setPeerSock(QTcpSocket *peer_sock);
     int pushMsg(JSPP msg);
     JSPP popMsg();
     string getPeerid();
@@ -45,7 +41,7 @@ public:
     size_t getUnsendCount();
     size_t getUnreadCount();
     void closeSock();
-    SOCKET getpeer_sock();
+    QTcpSocket* getpeer_sock();
 
     void send_msg(string msg);//暂时公开用作测试
 };

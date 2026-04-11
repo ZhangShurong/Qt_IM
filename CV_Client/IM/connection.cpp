@@ -3,8 +3,8 @@
 
 Connection::Connection()
     :connected(false),
-      peer_sock(INVALID_SOCKET),
-      self_sock(INVALID_SOCKET)
+      peer_sock(nullptr),
+      self_sock(nullptr)
 {
     timer = new QTimer(this);
     peer_id = "";
@@ -18,12 +18,13 @@ Connection::~Connection()
 {
     if(timer)
         delete timer;
+    closeSock();
 }
 
-Connection::Connection(SOCKET sock)
+Connection::Connection(QTcpSocket *sock)
     :connected(false),
       peer_sock(sock),
-      self_sock(INVALID_SOCKET)
+      self_sock(nullptr)
 {
     timer = new QTimer(this);
     peer_id = "";
@@ -32,12 +33,13 @@ Connection::Connection(SOCKET sock)
     linksigSlot();
 }
 
-void Connection::setPeerSock(SOCKET peer_sock)
+void Connection::setPeerSock(QTcpSocket *peer_sock)
 {
-    if(peer_sock == INVALID_SOCKET)
+    if(!peer_sock)
         return;
-    if(this->peer_sock != INVALID_SOCKET){
-        closesocket(this->peer_sock);
+    if(this->peer_sock){
+        this->peer_sock->close();
+        delete this->peer_sock;
         connected = false;
     }
     this->peer_sock = peer_sock;
@@ -48,94 +50,47 @@ void Connection::setPeerSock(SOCKET peer_sock)
  */
 void Connection::recv_msg()
 {
-    if(peer_sock == INVALID_SOCKET)
+    if(!peer_sock)
         return;
-    int iResult;
-    char recvbuf[LINE_BUF] = {0};
-    int recvbuflen = LINE_BUF;
+
     connected = true;
-    do {
-        iResult = recv(peer_sock, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-
-            JSPP msg = parse(string(recvbuf));
-            if(peer_id == "") {
-                peer_id = msg.from;
-            }
-            //im->mergeConn();
-            printf("Bytes received: %d and body is %s\n", iResult, msg.body.c_str());
-            im->pushMsg(msg);
+    while (peer_sock->bytesAvailable() > 0 || peer_sock->waitForReadyRead(1000)) {
+        QByteArray recvData = peer_sock->readAll();
+        if (recvData.isEmpty()) {
+            qDebug() << "Connection closing...";
+            break;
         }
-        else if (iResult == 0)
-            printf("Connection closing...\n");
-        else  {
-            printf("recv failed with error: %d\n", WSAGetLastError());
-            closesocket(peer_sock);
-            break ;
-        }
-    } while (iResult > 0);
 
-    // shutdown the connection since we're done
-    iResult = shutdown(peer_sock, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(peer_sock);
+        JSPP msg = parse(recvData.toStdString());
+        if(peer_id.empty()) {
+            peer_id = msg.from;
+        }
+        qDebug() << "Bytes received:" << recvData.size() << "body:" << QString::fromStdString(msg.body);
+        im->pushMsg(msg);
     }
 
     // cleanup
-    closesocket(peer_sock);
+    if(peer_sock) {
+        peer_sock->close();
+    }
     connected = false;
-    peer_sock = INVALID_SOCKET;
+    delete peer_sock;
+    peer_sock = nullptr;
 }
 
 int Connection::connectToPeer()
 {
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-
-    int iResult;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    // Resolve the server address and port
     string add = IP_PORT(im->frient_ip_map[peer_id]).address;
     string port = IP_PORT(im->frient_ip_map[peer_id]).port;
 
-    iResult = getaddrinfo(add.c_str(), port.c_str(), &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        return 1;
-    }
+    self_sock = new QTcpSocket(this);
+    self_sock->connectToHost(QString::fromStdString(add),
+                            QString::fromStdString(port).toInt());
 
-    // Attempt to connect to an address until one succeeds
-    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
-
-        // Create a SOCKET for connecting to server
-        self_sock = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-        if (self_sock == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
-            return 1;
-        }
-
-        // Connect to server.
-        iResult = ::connect( self_sock, ptr->ai_addr, (int)ptr->ai_addrlen);
-        if (iResult == SOCKET_ERROR) {
-            closesocket(self_sock);
-            self_sock = INVALID_SOCKET;
-            continue;
-        }
-        break;
-    }
-
-    freeaddrinfo(result);
-
-    if (self_sock == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
+    if (!self_sock->waitForConnected(5000)) {
+        qDebug() << "connectToPeer failed:" << self_sock->errorString();
+        delete self_sock;
+        self_sock = nullptr;
         return 1;
     }
     return 0;
@@ -146,32 +101,22 @@ int Connection::connectToPeer()
  */
 void Connection::send_msg(string msg)
 {
-
-    if(self_sock == INVALID_SOCKET){
+    if(!self_sock){
         connectToPeer();
     }
     string send_str = msg;
 
-    const char *sendbuf = send_str.c_str();
-    // Send an initial buffer
-    int iResult = send( self_sock, sendbuf, (int)strlen(sendbuf), 0 );
-    if (iResult == SOCKET_ERROR) {
-        printf("send failed with error: %d\n", WSAGetLastError());
-        closesocket(self_sock);
-        self_sock = INVALID_SOCKET;
+    QByteArray sendData(send_str.c_str());
+    qint64 iResult = self_sock->write(sendData);
+    if (iResult < 0) {
+        qDebug() << "send failed with error:" << self_sock->errorString();
+        self_sock->close();
+        delete self_sock;
+        self_sock = nullptr;
         return ;
     }
 
-    printf("Bytes Sent: %ld\n", iResult);
-
-//    shutdown the since no more data will be sent
-//    iResult = shutdown(self_sock, SD_SEND);
-//    if (iResult == SOCKET_ERROR) {
-//        printf("shutdown failed with error: %d\n", WSAGetLastError());
-//        closesocket(self_sock);
-//        self_sock = INVALID_SOCKET;
-//        return ;
-//    }
+    qDebug() << "Bytes Sent:" << iResult;
 }
 
 void Connection::linksigSlot()
@@ -196,13 +141,6 @@ int Connection::pushMsg(JSPP msg)
 JSPP Connection::popMsg()
 {
     JSPP msg;
-
-    /*
-    if(im->unread_msg_list.size() > 0) {
-        msg = im->unread_msg_list.back();
-        im->unread_msg_list.pop_back();
-    }
-    */
     return msg;
 }
 
@@ -219,7 +157,6 @@ void Connection::setPeer_id(string id)
  size_t Connection::getUnsendCount()
 {
      //todo 此接口的作用
-    //return im->unsend_msg_vec.size();
      return 0;
 }
 
@@ -230,13 +167,15 @@ void Connection::setPeer_id(string id)
 
 void Connection::closeSock()
 {
-    if(peer_sock != INVALID_SOCKET){
-        closesocket(peer_sock);
+    if(peer_sock){
+        peer_sock->close();
+        delete peer_sock;
         connected = false;
+        peer_sock = nullptr;
     }
 }
 
-SOCKET Connection::getpeer_sock()
+QTcpSocket* Connection::getpeer_sock()
 {
     return peer_sock;
 }

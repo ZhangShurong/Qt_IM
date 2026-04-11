@@ -1,0 +1,4 @@
+/data00/home/zhangshurong/project/Qt_IM/tests/build/CMakeFiles/run_tests.dir
+/data00/home/zhangshurong/project/Qt_IM/tests/build/CMakeFiles/test.dir
+/data00/home/zhangshurong/project/Qt_IM/tests/build/CMakeFiles/edit_cache.dir
+/data00/home/zhangshurong/project/Qt_IM/tests/build/CMakeFiles/rebuild_cache.dir

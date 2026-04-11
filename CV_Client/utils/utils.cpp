@@ -54,12 +54,11 @@ AES_utils::AES_utils()
 
 int AES_utils::encrypt(unsigned char *in, size_t src_len, unsigned char *out)
 {
-
-    char *temp = new char[src_len];
-    memcpy(temp, in, src_len);
-    int len = moo.Encrypt((unsigned char *)temp, src_len, (unsigned char *)out);
+    // Use vector for automatic memory management to prevent memory leak
+    std::vector<char> temp(src_len);
+    memcpy(temp.data(), in, src_len);
+    int len = moo.Encrypt((unsigned char *)temp.data(), src_len, (unsigned char *)out);
     return len;
-
 }
 
 int AES_utils::decrypt(unsigned char *in, size_t src_len, unsigned char *out)

@@ -6,12 +6,10 @@
 #include <QTimer>
 #include <QMutex>
 #include <QDebug>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <QTcpSocket>
 #include "protocol/jspp.h"
 #include <list>
 #include <map>
-#include <QTcpSocket>
 #include "user.h"
 #define LINE_BUF 2048
 using std::string;
@@ -20,7 +18,6 @@ using std::list;
 using std::map;
 
 class User;
-//class Conversation;
 class Connection;
 class JSPP;
 
@@ -55,7 +52,7 @@ private:
     IMClient(IMClient const&) = delete;           // copy ctor hidden
     IMClient& operator=(IMClient const&) = delete; // assign op. hidden
     ~IMClient();// dtor hidden
-    SOCKET connectPeer(string peer_id);
+    QTcpSocket* connectPeer(string peer_id);
 };
 
 #endif // IMCLIENT_H
